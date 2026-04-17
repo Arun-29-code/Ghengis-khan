@@ -1,0 +1,222 @@
+{
+  "NHS COVENTRY AND WARWICKSHIRE ICB": {
+    "category": 1,
+    "label": "Category 1",
+    "performance": 120
+  },
+  "NHS NORTH WEST LONDON ICB": {
+    "category": 1,
+    "label": "Category 1",
+    "performance": 120
+  },
+  "NHS HEREFORDSHIRE AND WORCESTERSHIRE ICB": {
+    "category": 1,
+    "label": "Category 1",
+    "performance": 120
+  },
+  "NHS CHESHIRE AND MERSEYSIDE ICB": {
+    "category": 1,
+    "label": "Category 1",
+    "performance": 120
+  },
+  "NHS BLACK COUNTRY ICB": {
+    "category": 1,
+    "label": "Category 1",
+    "performance": 120
+  },
+  "NHS SOUTH EAST LONDON ICB": {
+    "category": 1,
+    "label": "Category 1",
+    "performance": 120
+  },
+  "NHS LANCASHIRE AND SOUTH CUMBRIA ICB": {
+    "category": 2,
+    "label": "Category 2",
+    "performance": 110
+  },
+  "NHS BIRMINGHAM AND SOLIHULL ICB": {
+    "category": 2,
+    "label": "Category 2",
+    "performance": 110
+  },
+  "NHS NORTH EAST AND NORTH CUMBRIA ICB": {
+    "category": 2,
+    "label": "Category 2",
+    "performance": 110
+  },
+  "NHS GREATER MANCHESTER ICB": {
+    "category": 3,
+    "label": "Category 3",
+    "performance": 90
+  },
+  "NHS NORTH CENTRAL LONDON ICB": {
+    "category": 3,
+    "label": "Category 3",
+    "performance": 90
+  },
+  "NHS SUSSEX ICB": {
+    "category": 3,
+    "label": "Category 3",
+    "performance": 90
+  },
+  "NHS BRISTOL, NORTH SOMERSET AND SOUTH GLOUCESTERSHIRE ICB": {
+    "category": 3,
+    "label": "Category 3",
+    "performance": 90
+  },
+  "OTHER ICBS": {
+    "category": 3,
+    "label": "Category 3",
+    "performance": 90
+  },
+  "NHS HERTFORDSHIRE AND WEST ESSEX ICB": {
+    "category": 4,
+    "label": "Category 4",
+    "performance": 70
+  },
+  "NHS HAMPSHIRE AND ISLE OF WIGHT ICB": {
+    "category": 4,
+    "label": "Category 4",
+    "performance": 70
+  },
+  "NHS FRIMLEY ICB": {
+    "category": 4,
+    "label": "Category 4",
+    "performance": 70
+  },
+  "NHS SOUTH WEST LONDON ICB": {
+    "category": 4,
+    "label": "Category 4",
+    "performance": 70
+  },
+  "NHS STAFFORDSHIRE AND STOKE-ON-TRENT ICB": {
+    "category": 5,
+    "label": "Category 5",
+    "performance": 50
+  },
+  "NHS KENT AND MEDWAY ICB": {
+    "category": 5,
+    "label": "Category 5",
+    "performance": 50
+  },
+  "NHS SURREY HEARTLANDS ICB": {
+    "category": 5,
+    "label": "Category 5",
+    "performance": 50
+  },
+  "NHS HUMBER AND NORTH YORKSHIRE ICB": {
+    "category": 5,
+    "label": "Category 5",
+    "performance": 50
+  },
+  "NHS CORNWALL AND THE ISLES OF SCILLY ICB": {
+    "category": 5,
+    "label": "Category 5",
+    "performance": 50
+  },
+  "NHS SOMERSET ICB": {
+    "category": 5,
+    "label": "Category 5",
+    "performance": 50
+  },
+  "NHS SUFFOLK AND NORTH EAST ESSEX ICB": {
+    "category": 6,
+    "label": "No Customers",
+    "performance": 0
+  },
+  "NHS SOUTH YORKSHIRE ICB": {
+    "category": 6,
+    "label": "No Customers",
+    "performance": 0
+  },
+  "NHS NORTH EAST LONDON ICB": {
+    "category": 6,
+    "label": "No Customers",
+    "performance": 0
+  },
+  "NHS DORSET ICB": {
+    "category": 6,
+    "label": "No Customers",
+    "performance": 0
+  },
+  "TO BE CONFIRMED": {
+    "category": 6,
+    "label": "No Customers",
+    "performance": 0
+  },
+  "NHS NORFOLK AND WAVENEY ICB": {
+    "category": 6,
+    "label": "No Customers",
+    "performance": 0
+  },
+  "NHS GLOUCESTERSHIRE ICB": {
+    "category": 6,
+    "label": "No Customers",
+    "performance": 0
+  },
+  "NHS LEICESTER, LEICESTERSHIRE AND RUTLAND ICB": {
+    "category": 6,
+    "label": "No Customers",
+    "performance": 0
+  },
+  "NHS MID AND SOUTH ESSEX ICB": {
+    "category": 6,
+    "label": "No Customers",
+    "performance": 0
+  },
+  "NHS LINCOLNSHIRE ICB": {
+    "category": 6,
+    "label": "No Customers",
+    "performance": 0
+  },
+  "NHS BUCKINGHAMSHIRE, OXFORDSHIRE AND BERKSHIRE WEST ICB": {
+    "category": 6,
+    "label": "No Customers",
+    "performance": 0
+  },
+  "NHS NORTHAMPTONSHIRE ICB": {
+    "category": 6,
+    "label": "No Customers",
+    "performance": 0
+  },
+  "NHS WEST YORKSHIRE ICB": {
+    "category": 6,
+    "label": "No Customers",
+    "performance": 0
+  },
+  "NHS DEVON ICB": {
+    "category": 6,
+    "label": "No Customers",
+    "performance": 0
+  },
+  "NHS DERBY AND DERBYSHIRE ICB": {
+    "category": 6,
+    "label": "No Customers",
+    "performance": 0
+  },
+  "NHS CAMBRIDGESHIRE AND PETERBOROUGH ICB": {
+    "category": 6,
+    "label": "No Customers",
+    "performance": 0
+  },
+  "NHS NOTTINGHAM AND NOTTINGHAMSHIRE ICB": {
+    "category": 6,
+    "label": "No Customers",
+    "performance": 0
+  },
+  "NHS BATH AND NORTH EAST SOMERSET, SWINDON AND WILTSHIRE ICB": {
+    "category": 6,
+    "label": "No Customers",
+    "performance": 0
+  },
+  "NHS SHROPSHIRE, TELFORD AND WREKIN ICB": {
+    "category": 6,
+    "label": "No Customers",
+    "performance": 0
+  },
+  "NHS BEDFORDSHIRE, LUTON AND MILTON KEYNES ICB": {
+    "category": 6,
+    "label": "No Customers",
+    "performance": 0
+  }
+}
