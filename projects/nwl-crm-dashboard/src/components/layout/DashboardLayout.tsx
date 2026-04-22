@@ -6,6 +6,7 @@ import { CSVUploadButton } from '@/components/ui/CSVUploadButton'
 import { OverviewTab } from '@/components/overview/OverviewTab'
 import { GroupSplitEntry } from '@/components/overview/GroupSplitEntry'
 import { KPITab } from '@/components/kpis/KPITab'
+import { FinancialsTab } from '@/components/financials/FinancialsTab'
 import { useDashboardStore } from '@/hooks/useDashboardStore'
 import { formatDate } from '@/lib/utils'
 import type { CSVUpload, GroupSplit, ParseResult } from '@/lib/types'
@@ -154,10 +155,7 @@ export function DashboardLayout({
           ) : activeTab === 'kpis' ? (
             <KPITab onUpload={handleUpload} />
           ) : activeTab === 'financials' ? (
-            <TabPlaceholder
-              title="Financials"
-              note="Group tariff cards and revenue donut land here in Phase 8."
-            />
+            <FinancialsTab onUpload={handleUpload} />
           ) : (
             <TabPlaceholder
               title="PCN Practices"

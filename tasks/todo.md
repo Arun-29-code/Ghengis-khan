@@ -65,8 +65,9 @@ Build the NWL CRM Dashboard (`projects/nwl-crm-dashboard`) from the spec in `pro
 - [x] Commit: `Add KPI Performance tab`
 
 ### Phase 8 — Financials tab
-- [ ] `src/components/financials/{GroupTariffCards,RevenueDonutChart}.tsx` (spec §10.6)
-- [ ] Commit: `Add Financials tab`
+- [x] `src/components/financials/{GroupTariffCards,RevenueDonutChart,FinancialsTab}.tsx` (spec §10.6)
+- [x] Recharts PieChart (donut, innerRadius=60) + stats strip + KPI revenue allocation list
+- [x] Commit: `Add Financials tab`
 
 ### Phase 9 — PCN Practices tab
 - [ ] `src/components/practices/PracticeCard.tsx` + grid of 7 K&W West practices
