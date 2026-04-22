@@ -17,9 +17,18 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  // suppressHydrationWarning on <html> and <body>: browser extensions
+  // (Grammarly, InboxSDK, etc.) inject data-* attributes into these elements
+  // before React hydrates, which triggers a false-positive mismatch warning.
   return (
-    <html lang="en" className={`${inter.variable} h-full antialiased`}>
-      <body className="min-h-full">{children}</body>
+    <html
+      lang="en"
+      className={`${inter.variable} h-full antialiased`}
+      suppressHydrationWarning
+    >
+      <body className="min-h-full" suppressHydrationWarning>
+        {children}
+      </body>
     </html>
   )
 }
