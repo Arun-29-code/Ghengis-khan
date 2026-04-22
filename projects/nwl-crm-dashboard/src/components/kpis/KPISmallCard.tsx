@@ -1,27 +1,16 @@
 import { Badge } from '@/components/ui/Badge'
 import { GaugeSVG } from './GaugeSVG'
 import { cn, fmt } from '@/lib/utils'
-import type { KPIResult, RAGStatus } from '@/lib/types'
+import { deriveStatusBadge, RAG_COLOR } from './status'
+import type { KPIResult } from '@/lib/types'
 
 interface KPISmallCardProps {
   result: KPIResult
   className?: string
 }
 
-const RAG_COLOR: Record<RAGStatus, string> = {
-  green: 'var(--color-success)',
-  amber: 'var(--color-warning)',
-  red:   'var(--color-destructive)',
-}
-
-const RAG_BADGE: Record<RAGStatus, { variant: 'success' | 'warning' | 'destructive'; label: string }> = {
-  green: { variant: 'success',     label: 'On track' },
-  amber: { variant: 'warning',     label: 'At risk'  },
-  red:   { variant: 'destructive', label: 'Behind'   },
-}
-
 export function KPISmallCard({ result, className }: KPISmallCardProps) {
-  const badge = RAG_BADGE[result.ragStatus]
+  const badge = deriveStatusBadge(result.paymentBand, result.ragStatus)
   const hasData = result.denominator > 0
 
   return (

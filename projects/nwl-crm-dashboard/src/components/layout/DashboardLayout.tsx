@@ -36,10 +36,13 @@ export function DashboardLayout({
   const [pending, setPending] = useState<PendingUpload | null>(null)
   const addUpload = useDashboardStore((s) => s.addUpload)
 
-  // Zustand persist has skipHydration: true; rehydrate once on mount.
+  // Zustand persist has skipHydration: true. Subscribe to onFinishHydration
+  // (so we flip hydrated from a callback, not synchronously in the effect body)
+  // and then trigger the rehydrate itself.
   useEffect(() => {
-    useDashboardStore.persist.rehydrate()
-    setHydrated(true)
+    const unsub = useDashboardStore.persist.onFinishHydration(() => setHydrated(true))
+    void useDashboardStore.persist.rehydrate()
+    return unsub
   }, [])
 
   const currentUpload = useDashboardStore((s) => s.currentUpload)

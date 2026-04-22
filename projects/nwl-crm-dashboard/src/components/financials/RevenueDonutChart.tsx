@@ -61,7 +61,10 @@ export function RevenueDonutChart({
               ))}
             </Pie>
             <Tooltip
-              formatter={(value: number) => fmt(value, { currency: true })}
+              formatter={(value) => {
+                const n = typeof value === 'number' ? value : Number(value ?? 0)
+                return fmt(n, { currency: true })
+              }}
               contentStyle={{
                 backgroundColor: 'rgba(255,255,255,0.95)',
                 border: '1px solid var(--color-border)',
