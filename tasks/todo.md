@@ -24,10 +24,11 @@ Build the NWL CRM Dashboard (`projects/nwl-crm-dashboard`) from the spec in `pro
 - [ ] Commit: `Add foundation: types, constants, design tokens`
 
 ### Phase 2 — Business logic
-- [ ] Write `src/lib/csv-parser.ts` (spec §7) — handle `*` prefix, quoted fields, CRM06N mapping, Group 1/2/3 regex, CRM08 A/B/C sub-KPIs
-- [ ] Write `src/lib/kpi-engine.ts` (spec §8) — RAG (pace + threshold), revenue buckets, patients needed, run rate, delta
-- [ ] Verify against spec fixture (§15): £131,089 total, CRM01A=3.71% red, CRM05=68.76% green, CRM07 9/wk
-- [ ] Commit: `Add CSV parser and KPI engine`
+- [x] Write `src/lib/csv-parser.ts` (spec §7) — handle `*` prefix, quoted fields, CRM06N mapping, Group 1/2/3 regex, CRM08 A/B/C sub-KPIs
+- [x] Write `src/lib/kpi-engine.ts` (spec §8) — RAG (pace + threshold), revenue buckets, patients needed, run rate, delta
+- [x] Write `scripts/verify-fixture.ts` — runs parser + engine against the Premier fixture
+- [x] Verify: parser 12/12 clean; engine 18/22 spec checks pass — 4 discrepancies are spec-internal inconsistencies (CRM01A rag, CRM01A ptsNeeded off-by-1, CRM03 paymentBand, CRM03 rag) — see chat for analysis
+- [x] Commit: `Add CSV parser and KPI engine`
 - [ ] **→ PAUSE: check in with Arun before Phase 3**
 
 ### Phase 3 — Auth + login
