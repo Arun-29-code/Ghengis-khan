@@ -19,11 +19,18 @@ const RAG_BADGE: Record<RAGStatus, { variant: 'success' | 'warning' | 'destructi
   red:   { variant: 'destructive', label: 'Behind'   },
 }
 
+// Fixed "finish line" position across all CRM01 bars, regardless of each KPI's
+// underlying target %. Reaching t100 fills the bar to this mark; overshoot fills
+// the remaining 15% up to 100% of the track.
+const TARGET_POSITION_PCT = 85
+
 export function KPIHBarRow({ result, className }: KPIHBarRowProps) {
   const badge = RAG_BADGE[result.ragStatus]
   const hasData = result.denominator > 0
-  const currentClamped = Math.max(0, Math.min(100, result.current))
-  const targetClamped = Math.max(0, Math.min(100, result.t100))
+
+  const progressRatio = result.t100 > 0 ? result.current / result.t100 : 0
+  const progressPct = progressRatio * 100
+  const fillWidthPct = Math.min(100, Math.max(0, progressRatio * TARGET_POSITION_PCT))
 
   return (
     <div
@@ -48,29 +55,47 @@ export function KPIHBarRow({ result, className }: KPIHBarRowProps) {
       </div>
 
       <div>
-        <div
-          className="relative h-3 w-full overflow-hidden rounded-full bg-muted"
-          aria-label={`${result.short} progress`}
-          role="img"
-        >
+        <div className="relative">
           <div
-            className={cn('h-full transition-[width] duration-500', RAG_BG[result.ragStatus])}
-            style={{ width: `${currentClamped}%` }}
-          />
+            className="relative h-3 w-full overflow-hidden rounded-full bg-muted"
+            aria-label={`${result.short} progress toward target`}
+            role="img"
+          >
+            <div
+              className={cn(
+                'h-full transition-[width] duration-500',
+                RAG_BG[result.ragStatus],
+              )}
+              style={{ width: `${fillWidthPct}%` }}
+            />
+          </div>
+          {/* Target "finish line" tick — fixed at the same position across all CRM01 bars.
+              Rendered outside the overflow-hidden track so it can extend above/below. */}
           <span
-            className="absolute top-0 h-full w-px bg-foreground/60"
-            style={{ left: `${targetClamped}%` }}
+            className="pointer-events-none absolute top-[-3px] h-[calc(100%+6px)] border-l border-dashed border-foreground/70"
+            style={{ left: `${TARGET_POSITION_PCT}%` }}
             aria-hidden
           />
+          <span
+            className="pointer-events-none absolute top-[-14px] -translate-x-1/2 whitespace-nowrap text-[9px] font-semibold uppercase tracking-wide text-muted-foreground"
+            style={{ left: `${TARGET_POSITION_PCT}%` }}
+            aria-hidden
+          >
+            target
+          </span>
         </div>
-        <div className="mt-1 flex items-baseline justify-between text-xs text-muted-foreground">
+
+        <div className="mt-1.5 flex flex-wrap items-baseline justify-between gap-x-3 text-xs text-muted-foreground">
           <span className="tabular-nums">
             <span className="font-semibold text-foreground">
-              {hasData ? `${result.current.toFixed(1)}%` : '—'}
+              {hasData ? `${progressPct.toFixed(0)}%` : '—'}
             </span>{' '}
-            of {result.denominator.toLocaleString() || '—'}
+            of target
           </span>
-          <span className="tabular-nums">target {result.t100.toFixed(1)}%</span>
+          <span className="tabular-nums">
+            {hasData ? `${result.current.toFixed(1)}% of ${result.denominator.toLocaleString()}` : '—'} ·
+            target {result.t100.toFixed(1)}%
+          </span>
         </div>
       </div>
 
