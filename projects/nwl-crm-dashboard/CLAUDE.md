@@ -15,10 +15,11 @@ estimates revenue at risk.
 1. 13 KPIs, each weighted % of total contract value (weights sum to 100).
 2. Cumulative KPIs (`type='C'`): RAG = pace-based (current% / expectedAtPace%).
    Static KPIs (`type='S'`, CRM03-06): RAG = threshold-based (current% vs t100/t50).
-3. If the gap between expected and actual patients < 1, treat as on-track (rounding).
-4. Small registers (denominator < 20): pace % unreliable — show caveat, don't use for RAG.
-5. Group 3 patients = CRM register size (CRM02 denominator) − Group 1 − Group 2.
-6. Revenue bucket: full payment → `secured`; on-track or half-pay → `onTarget`; else → `atRisk`.
+3. **Hybrid guard (cumulative only):** if pace says green but `current < t50`, demote to amber. Rationale — pace may be on track, but no payment bar has been crossed yet, so "green" is misleading. Introduced after Phase 2 fixture verification revealed the tension between spec §8 (pace) and spec §15 (threshold-leaning expected values).
+4. If the gap between expected and actual patients < 1, treat as on-track (rounding).
+5. Small registers (denominator < 20): pace % unreliable — show caveat, don't use for RAG.
+6. Group 3 patients = CRM register size (CRM02 denominator) − Group 1 − Group 2.
+7. Revenue bucket: full payment → `secured`; on-track or half-pay → `onTarget`; else → `atRisk`.
 
 ## Critical file locations
 - Business logic:   `src/lib/kpi-engine.ts`

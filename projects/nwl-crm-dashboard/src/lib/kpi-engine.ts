@@ -54,8 +54,14 @@ function computeRAG(args: {
   const expectedPatients = (expectedAtPace / 100) * denominator
   const gapPatients = expectedPatients - numerator
   const nearlyThere = gapPatients < 1
-  const rag: RAGStatus =
+  let rag: RAGStatus =
     pace >= 0.9 || nearlyThere ? 'green' : pace >= 0.5 ? 'amber' : 'red'
+
+  // Hybrid guard: a cumulative KPI can't be green if current% is still below
+  // the half-pay threshold. Pace may be on track, but payment-wise we are not
+  // past any payment bar yet — surface that with amber.
+  if (rag === 'green' && current < t50) rag = 'amber'
+
   return {
     rag,
     expectedAtPace,
