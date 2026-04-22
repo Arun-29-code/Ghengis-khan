@@ -19,6 +19,12 @@ Each lesson follows this structure:
 
 ## Lessons log
 
+### 2026-04-22 — Next.js 16 renamed `middleware.ts` to `proxy.ts`
+- **What happened**: Phase 3 of the NWL CRM build created `src/middleware.ts` using the `export { auth as middleware }` pattern straight from the spec. Worked, but Next 16's dev server warned the convention is deprecated. Had to rename the file *and* the export to `proxy`.
+- **Why it happened**: The build spec was written against Next.js 14. I'd already flagged and reconciled the Next 14→16 mismatch upfront, but reconciled it at the *package* level, not at every *file convention* level. File-convention renames that happen between major versions easily slip through.
+- **The rule going forward**: Before writing auth / routing / layout code for a new project, grep `node_modules/<framework>/dist/docs/` for any file-convention docs the AGENTS.md warning references. File conventions (middleware, not-found, layout groups, route segments) are where frameworks hide breaking renames. Treat every scaffolded convention name as potentially stale until verified.
+- **Tags**: `#assumptions` `#nextjs` `#dependencies`
+
 ### 2026-04-09 — Always fetch before reporting repo state
 - **What happened**: When asked to diagnose the repo's branch state, I reported that the PR merge hadn't landed on the default branch. This caused unnecessary alarm. After running `git fetch origin`, the merge was clearly there — my earlier check was working from stale local data.
 - **Why it happened**: I queried local references without first refreshing them from GitHub. Local Git data can lag behind the remote, especially after web-based operations like PR merges.

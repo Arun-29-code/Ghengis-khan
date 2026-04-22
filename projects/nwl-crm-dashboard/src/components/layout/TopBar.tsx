@@ -1,6 +1,6 @@
 'use client'
 
-import { Upload } from 'lucide-react'
+import type { ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 import type { TabId } from './Sidebar'
 
@@ -14,17 +14,15 @@ const TABS: { id: TabId; label: string }[] = [
 interface TopBarProps {
   activeTab: TabId
   onTabChange: (id: TabId) => void
-  onUploadClick?: () => void
   dateBadgeLabel?: string
-  uploading?: boolean
+  trailingSlot?: ReactNode
 }
 
 export function TopBar({
   activeTab,
   onTabChange,
-  onUploadClick,
   dateBadgeLabel,
-  uploading = false,
+  trailingSlot,
 }: TopBarProps) {
   return (
     <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center justify-between border-b border-border bg-card/85 px-6 shadow-sm backdrop-blur">
@@ -59,15 +57,7 @@ export function TopBar({
             {dateBadgeLabel}
           </span>
         ) : null}
-        <button
-          type="button"
-          onClick={onUploadClick}
-          disabled={uploading}
-          className="inline-flex items-center gap-2 rounded-lg bg-brand-gradient px-3 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          <Upload className="h-4 w-4" />
-          {uploading ? 'Uploading…' : 'Upload CSV'}
-        </button>
+        {trailingSlot}
       </div>
     </header>
   )

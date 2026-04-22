@@ -51,9 +51,12 @@ Build the NWL CRM Dashboard (`projects/nwl-crm-dashboard`) from the spec in `pro
 - [x] Commit: `Add shared UI components`
 
 ### Phase 6 — Overview tab
-- [ ] `src/components/overview/{HeadlineCards,RevenuePipeline,PriorityTable}.tsx`
-- [ ] Wire into dashboard page with empty/loaded state (spec §12)
-- [ ] Commit: `Add Overview tab`
+- [x] `src/components/overview/{HeadlineCards,RevenuePipeline,PriorityTable}.tsx` + `OverviewTab` wrapper + `GroupSplitEntry` panel for missing G1/G2
+- [x] Wire into `DashboardLayout` with empty/loaded state (spec §12), owning the upload handler and G3 derivation (CRM register − G1 − G2)
+- [x] `TopBar` refactored to accept `trailingSlot` (CSVUploadButton lives there)
+- [x] `dashboard/page.tsx` passes `practiceOds` (server reads env; client can't)
+- [x] Renamed `middleware.ts` → `proxy.ts` (Next 16 deprecation); lesson logged in `tasks/lessons.md`
+- [x] Commit: `Add Overview tab`
 
 ### Phase 7 — KPI Performance tab
 - [ ] `src/components/kpis/{KPISmallCard,KPIWideCard,KPIHBarRow}.tsx`
