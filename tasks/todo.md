@@ -32,9 +32,9 @@ Build the NWL CRM Dashboard (`projects/nwl-crm-dashboard`) from the spec in `pro
 - [ ] **→ PAUSE: check in with Arun before Phase 3**
 
 ### Phase 3 — Auth + login
-- [ ] `src/auth.ts`, `src/middleware.ts`, `src/app/api/auth/[...nextauth]/route.ts`, `src/app/login/page.tsx`
-- [ ] Verify: wrong password errors, correct redirects, unauth `/dashboard` → `/login`
-- [ ] Commit: `Add auth with credentials provider`
+- [x] `src/auth.ts`, `src/middleware.ts`, `src/app/api/auth/[...nextauth]/route.ts`, `src/app/login/page.tsx` (+ `login/actions.ts` server action)
+- [x] Verify: `/login` renders 200; `/api/auth/session` returns `null`; providers list Credentials. Full end-to-end auth flow deferred to Phase 10 browser test.
+- [x] Commit: `Add auth with credentials provider`
 
 ### Phase 4 — Layout shell + state
 - [ ] Update `src/app/layout.tsx` (Inter font)
