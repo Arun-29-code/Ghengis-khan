@@ -7,6 +7,7 @@ import { OverviewTab } from '@/components/overview/OverviewTab'
 import { GroupSplitEntry } from '@/components/overview/GroupSplitEntry'
 import { KPITab } from '@/components/kpis/KPITab'
 import { FinancialsTab } from '@/components/financials/FinancialsTab'
+import { PCNPracticesTab } from '@/components/practices/PCNPracticesTab'
 import { useDashboardStore } from '@/hooks/useDashboardStore'
 import { formatDate } from '@/lib/utils'
 import type { CSVUpload, GroupSplit, ParseResult } from '@/lib/types'
@@ -157,10 +158,7 @@ export function DashboardLayout({
           ) : activeTab === 'financials' ? (
             <FinancialsTab onUpload={handleUpload} />
           ) : (
-            <TabPlaceholder
-              title="PCN Practices"
-              note="K&W West PCN practice grid lands here in Phase 9."
-            />
+            <PCNPracticesTab currentOds={practiceOds} />
           )}
         </main>
       </div>
@@ -168,11 +166,3 @@ export function DashboardLayout({
   )
 }
 
-function TabPlaceholder({ title, note }: { title: string; note: string }) {
-  return (
-    <div className="mx-auto max-w-2xl rounded-xl border border-dashed border-border bg-card p-10 text-center">
-      <h2 className="text-lg font-semibold text-foreground">{title}</h2>
-      <p className="mt-2 text-sm text-muted-foreground">{note}</p>
-    </div>
-  )
-}

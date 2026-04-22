@@ -70,8 +70,10 @@ Build the NWL CRM Dashboard (`projects/nwl-crm-dashboard`) from the spec in `pro
 - [x] Commit: `Add Financials tab`
 
 ### Phase 9 — PCN Practices tab
-- [ ] `src/components/practices/PracticeCard.tsx` + grid of 7 K&W West practices
-- [ ] Commit: `Add PCN Practices tab`
+- [x] `src/components/practices/{PracticeCard,PCNPracticesTab}.tsx` + grid of 7 K&W West practices
+- [x] Current practice (Premier, ODS E84003) shows live revenue; siblings show "Data pending" (PCN aggregation is Phase 2)
+- [x] Removed now-dead `TabPlaceholder` helper in DashboardLayout
+- [x] Commit: `Add PCN Practices tab`
 
 ### Phase 10 — Verify + polish
 - [ ] Run all 11 acceptance tests (spec §15)
