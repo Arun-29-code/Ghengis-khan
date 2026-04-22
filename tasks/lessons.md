@@ -19,6 +19,12 @@ Each lesson follows this structure:
 
 ## Lessons log
 
+### 2026-04-22 — Audit specs for UX basics the spec itself missed
+- **What happened**: Built the NWL CRM Dashboard exactly per spec §10.2. Auth worked, upload worked, everything in the spec worked. But the spec didn't include a logout button anywhere in the sidebar or topbar — no way to end a session. Arun noticed post-build while browser-testing and asked me to save the lesson.
+- **Why it happened**: I treated the spec as authoritative for MVP scope. I *did* audit for tech mismatches (Next 14→16, Tailwind 3→4, Recharts 2→3) and internal contradictions (CRM01A RAG logic) — but didn't audit for *missing* UX table stakes. Sign-out on an auth'd app is the kind of thing that should always exist whether the spec names it or not.
+- **The rule going forward**: Before starting implementation of any spec, run a UX-basics checklist in the pre-build plan (auth → logout/identity; forms → error/loading; data → empty/loading/error; async → feedback; destructive → confirm). Flag anything missing to Arun in the plan check-in — before writing code — not after the user finds it. Also saved as a cross-project feedback memory (`feedback_spec_review.md`) since the pattern generalizes beyond Ghengis-khan.
+- **Tags**: `#spec-review` `#ux` `#planning` `#verification`
+
 ### 2026-04-22 — Next.js 16 renamed `middleware.ts` to `proxy.ts`
 - **What happened**: Phase 3 of the NWL CRM build created `src/middleware.ts` using the `export { auth as middleware }` pattern straight from the spec. Worked, but Next 16's dev server warned the convention is deprecated. Had to rename the file *and* the export to `proxy`.
 - **Why it happened**: The build spec was written against Next.js 14. I'd already flagged and reconciled the Next 14→16 mismatch upfront, but reconciled it at the *package* level, not at every *file convention* level. File-convention renames that happen between major versions easily slip through.
