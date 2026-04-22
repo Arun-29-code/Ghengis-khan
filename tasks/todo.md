@@ -46,9 +46,9 @@ Build the NWL CRM Dashboard (`projects/nwl-crm-dashboard`) from the spec in `pro
 - [x] Commit: `Add dashboard layout and store`
 
 ### Phase 5 — Shared UI primitives
-- [ ] `src/components/ui/{Badge,StatsCard,UploadBanner,Button,CSVUploadButton}.tsx`
-- [ ] `src/components/kpis/{GaugeSVG,KPISection}.tsx`
-- [ ] Commit: `Add shared UI components`
+- [x] `src/components/ui/{Badge,StatsCard,UploadBanner,Button,CSVUploadButton}.tsx`
+- [x] `src/components/kpis/{GaugeSVG,KPISection}.tsx`
+- [x] Commit: `Add shared UI components`
 
 ### Phase 6 — Overview tab
 - [ ] `src/components/overview/{HeadlineCards,RevenuePipeline,PriorityTable}.tsx`
