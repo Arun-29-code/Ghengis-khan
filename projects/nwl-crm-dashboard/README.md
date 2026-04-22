@@ -1,36 +1,37 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NWL CRM Dashboard
 
-## Getting Started
+Analytics dashboard for the NHS North West London (NWL) Cardiovascular-Renal-Metabolic
+Local Enhanced Service 2026-27. Practices upload their EMIS CSV export; the dashboard
+tracks KPI achievement, revenue at risk, and pace toward annual targets.
 
-First, run the development server:
+**First practice:** Premier Medical Centre (ODS: E84003), K&W West PCN
+**Contract weeks:** 52 · **Tariffs:** G1 £107.08/y · G2 £53.13/y · G3 £24.09/y
+
+## Getting started
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
+cp .env.example .env.local    # then fill in the values
+pnpm dev                      # → http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+See `NWL_CRM_DASHBOARD_BUILD_PROMPT.md` for the full build spec and `CLAUDE.md`
+for agent orientation.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Next.js 16 (App Router, TypeScript)
+- Tailwind CSS v4 (CSS-first `@theme`)
+- NextAuth v5 (beta, credentials provider)
+- Zustand + localStorage persistence
+- Recharts 3, Lucide icons, Papaparse, date-fns
+- pnpm, deployed to Vercel
 
-## Learn More
+## Scripts
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Command       | Purpose                                 |
+| ------------- | --------------------------------------- |
+| `pnpm dev`    | Run the dev server on :3000             |
+| `pnpm build`  | Production build                        |
+| `pnpm start`  | Run the production build                |
+| `pnpm lint`   | Run ESLint                              |
