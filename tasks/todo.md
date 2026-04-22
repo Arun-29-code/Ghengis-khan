@@ -37,12 +37,13 @@ Build the NWL CRM Dashboard (`projects/nwl-crm-dashboard`) from the spec in `pro
 - [x] Commit: `Add auth with credentials provider`
 
 ### Phase 4 — Layout shell + state
-- [ ] Update `src/app/layout.tsx` (Inter font)
-- [ ] Write `src/app/page.tsx` (redirect → /dashboard or /login)
-- [ ] `src/components/layout/{Sidebar,TopBar,DashboardLayout}.tsx`
-- [ ] `src/hooks/useDashboardStore.ts` (Zustand + persist, spec §11)
-- [ ] `src/app/dashboard/{layout,page}.tsx` (tab stubs)
-- [ ] Commit: `Add dashboard layout and store`
+- [x] Update `src/app/layout.tsx` (Inter font, clean metadata)
+- [x] Write `src/app/page.tsx` (server redirect based on `auth()`)
+- [x] `src/components/layout/{Sidebar,TopBar,DashboardLayout}.tsx` (all client)
+- [x] `src/hooks/useDashboardStore.ts` — Zustand + persist (skipHydration to avoid SSR mismatch, rehydrate on mount)
+- [x] `src/app/dashboard/page.tsx` (renders `<DashboardLayout>`; tab content stubs inside DashboardLayout itself)
+- [x] Added `authorized` callback to `src/auth.ts` so middleware actually redirects unauth users
+- [x] Commit: `Add dashboard layout and store`
 
 ### Phase 5 — Shared UI primitives
 - [ ] `src/components/ui/{Badge,StatsCard,UploadBanner,Button,CSVUploadButton}.tsx`
