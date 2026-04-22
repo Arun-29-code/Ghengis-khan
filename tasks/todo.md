@@ -59,10 +59,10 @@ Build the NWL CRM Dashboard (`projects/nwl-crm-dashboard`) from the spec in `pro
 - [x] Commit: `Add Overview tab`
 
 ### Phase 7 — KPI Performance tab
-- [ ] `src/components/kpis/{KPISmallCard,KPIWideCard,KPIHBarRow}.tsx`
-- [ ] KPI tab page with sections for CRM01 (5 bars), CRM02 (wide), CRM03–06 (4 small), CRM07 (wide), CRM08 A/B/C + CRM09 (4 small)
-- [ ] Sidebar scroll-to-section logic (spec §13)
-- [ ] Commit: `Add KPI Performance tab`
+- [x] `src/components/kpis/{KPISmallCard,KPIWideCard,KPIHBarRow}.tsx`
+- [x] `src/components/kpis/KPITab.tsx` — sections for CRM01 (5 bars), CRM02 (wide), CRM03–06 (4 small), CRM07 (wide), CRM08A/B/C + CRM09 (4 small); each section badge shows worst RAG
+- [x] Sidebar sub-nav items when `activeTab === 'kpis'`; `scrollIntoView` + `animate-nav-flash` on section land
+- [x] Commit: `Add KPI Performance tab`
 
 ### Phase 8 — Financials tab
 - [ ] `src/components/financials/{GroupTariffCards,RevenueDonutChart}.tsx` (spec §10.6)

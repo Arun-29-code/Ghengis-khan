@@ -5,6 +5,7 @@ import { AlertCircle } from 'lucide-react'
 import { CSVUploadButton } from '@/components/ui/CSVUploadButton'
 import { OverviewTab } from '@/components/overview/OverviewTab'
 import { GroupSplitEntry } from '@/components/overview/GroupSplitEntry'
+import { KPITab } from '@/components/kpis/KPITab'
 import { useDashboardStore } from '@/hooks/useDashboardStore'
 import { formatDate } from '@/lib/utils'
 import type { CSVUpload, GroupSplit, ParseResult } from '@/lib/types'
@@ -97,11 +98,28 @@ export function DashboardLayout({
     [finalizeUpload],
   )
 
+  const handleNavigateToSection = useCallback(
+    (sectionId: string) => {
+      // Tab switch is a no-op if already on kpis. scrollIntoView happens after
+      // the next paint so the section has actually rendered.
+      setActiveTab('kpis')
+      requestAnimationFrame(() => {
+        const el = document.getElementById(sectionId)
+        if (!el) return
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        el.classList.add('animate-nav-flash')
+        window.setTimeout(() => el.classList.remove('animate-nav-flash'), 1200)
+      })
+    },
+    [],
+  )
+
   return (
     <div className="flex min-h-screen">
       <Sidebar
         activeTab={activeTab}
         onTabChange={setActiveTab}
+        onNavigateToSection={handleNavigateToSection}
         practiceName={practiceName}
         pcnName={pcnName}
         lastUploadLabel={lastUploadLabel}
@@ -134,10 +152,7 @@ export function DashboardLayout({
           ) : activeTab === 'overview' ? (
             <OverviewTab onUpload={handleUpload} />
           ) : activeTab === 'kpis' ? (
-            <TabPlaceholder
-              title="KPI Performance"
-              note="Per-KPI cards (gauges, horizontal bars) land here in Phase 7."
-            />
+            <KPITab onUpload={handleUpload} />
           ) : activeTab === 'financials' ? (
             <TabPlaceholder
               title="Financials"
