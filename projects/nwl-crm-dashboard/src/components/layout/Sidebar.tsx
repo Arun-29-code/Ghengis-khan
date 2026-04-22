@@ -11,9 +11,11 @@ import {
   Target,
   HeartHandshake,
   MessagesSquare,
+  LogOut,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { KPI_SECTION_IDS } from '@/components/kpis/KPITab'
+import { signOutAction } from './actions'
 
 export type TabId = 'overview' | 'kpis' | 'financials' | 'practices'
 
@@ -133,6 +135,15 @@ export function Sidebar({
         ) : (
           <p>No uploads yet</p>
         )}
+        <form action={signOutAction} className="mt-3 border-t border-white/10 pt-3">
+          <button
+            type="submit"
+            className="flex items-center gap-2 text-xs text-white/60 transition hover:text-white"
+          >
+            <LogOut className="h-3.5 w-3.5" aria-hidden />
+            Sign out
+          </button>
+        </form>
       </div>
     </aside>
   )
