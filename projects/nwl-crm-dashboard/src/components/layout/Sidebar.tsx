@@ -10,7 +10,8 @@ import {
   ClipboardCheck,
   Target,
   HeartHandshake,
-  MessagesSquare,
+  Activity,
+  Gauge,
   LogOut,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -39,11 +40,12 @@ interface KPISubNavItem {
 }
 
 const KPI_SUBNAV: KPISubNavItem[] = [
-  { sectionId: KPI_SECTION_IDS.detection,     label: 'Detection',          icon: Stethoscope },
-  { sectionId: KPI_SECTION_IDS.careProcess,   label: 'Care processes',     icon: ClipboardCheck },
-  { sectionId: KPI_SECTION_IDS.outcomes,      label: 'Outcomes',           icon: Target },
-  { sectionId: KPI_SECTION_IDS.carePlan,      label: 'Care plan',          icon: HeartHandshake },
-  { sectionId: KPI_SECTION_IDS.conversations, label: 'Conversations',      icon: MessagesSquare },
+  { sectionId: KPI_SECTION_IDS.detection,        label: 'Detection',         icon: Stethoscope },
+  { sectionId: KPI_SECTION_IDS.careProcess,      label: 'Care processes',    icon: ClipboardCheck },
+  { sectionId: KPI_SECTION_IDS.outcomes,         label: 'Outcomes',          icon: Target },
+  { sectionId: KPI_SECTION_IDS.carePlan,         label: 'Care plan',         icon: HeartHandshake },
+  { sectionId: KPI_SECTION_IDS.lifestyle,        label: 'Lifestyle',         icon: Activity },
+  { sectionId: KPI_SECTION_IDS.healthConfidence, label: 'Health Confidence', icon: Gauge },
 ]
 
 interface SidebarProps {

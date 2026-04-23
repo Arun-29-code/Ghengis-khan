@@ -16,11 +16,12 @@ interface KPITabProps {
 
 // Section IDs must match the sidebar sub-nav targets (spec §13 scroll anchors).
 export const KPI_SECTION_IDS = {
-  detection:    'section-detection',
-  careProcess:  'section-care-processes',
-  outcomes:     'section-outcomes',
-  carePlan:     'section-care-plan',
-  conversations:'section-conversations',
+  detection:       'section-detection',
+  careProcess:     'section-care-processes',
+  outcomes:        'section-outcomes',
+  carePlan:        'section-care-plan',
+  lifestyle:       'section-lifestyle',
+  healthConfidence:'section-health-confidence',
 } as const
 
 const RAG_ORDER: Record<RAGStatus, number> = { red: 0, amber: 1, green: 2 }
@@ -70,7 +71,6 @@ export function KPITab({ onUpload }: KPITabProps) {
   const carePlan     = pickByCodes(results, ['CRM07'])
   const [crm08]      = pickByCodes(results, ['CRM08'])
   const [crm09]      = pickByCodes(results, ['CRM09'])
-  const conversations = [crm08, crm09].filter(Boolean) as KPIResult[]
 
   return (
     <div className="space-y-6">
@@ -130,18 +130,29 @@ export function KPITab({ onUpload }: KPITabProps) {
         </div>
       </KPISection>
 
-      <KPISection
-        id={KPI_SECTION_IDS.conversations}
-        title="Conversations & Habits — CRM08 / CRM09"
-        subtitle="Lifestyle improvement (activity / BMI / smoking) and patient-reported confidence"
-        tariffLabel="10% of contract"
-        rag={worstRAG(conversations)}
-      >
-        <div className="space-y-3">
-          {crm08 ? <CRM08Card result={crm08} breakdown={crm08Breakdown} /> : null}
-          {crm09 ? <KPIWideCard result={crm09} /> : null}
-        </div>
-      </KPISection>
+      {crm08 ? (
+        <KPISection
+          id={KPI_SECTION_IDS.lifestyle}
+          title="CRM08 — Lifestyle Improvement"
+          subtitle="% of Group 1/2 patients with improvement in physical activity, BMI, or smoking status"
+          tariffLabel={`target ${crm08.t100.toFixed(1)}%`}
+          rag={crm08.ragStatus}
+        >
+          <CRM08Card result={crm08} breakdown={crm08Breakdown} />
+        </KPISection>
+      ) : null}
+
+      {crm09 ? (
+        <KPISection
+          id={KPI_SECTION_IDS.healthConfidence}
+          title="CRM09 — Health Confidence Score"
+          subtitle="% of Group 1/2 patients with pre- and post- care planning Health Confidence Score recorded"
+          tariffLabel={`target ${crm09.t100.toFixed(0)}%`}
+          rag={crm09.ragStatus}
+        >
+          <KPIWideCard result={crm09} />
+        </KPISection>
+      ) : null}
     </div>
   )
 }
