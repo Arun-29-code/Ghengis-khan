@@ -1,7 +1,8 @@
 import { StatsCard } from '@/components/ui/StatsCard'
 import { Badge } from '@/components/ui/Badge'
+import { statusBadge } from '@/components/kpis/status'
 import { fmt } from '@/lib/utils'
-import type { KPIResult } from '@/lib/types'
+import type { KPIResult, RAGStatus } from '@/lib/types'
 
 interface HeadlineCardsProps {
   totalRevenue: number
@@ -28,12 +29,12 @@ export function HeadlineCards({
 
   const pct = (n: number) => (totalRevenue > 0 ? (n / totalRevenue) * 100 : 0)
 
-  const statusBadge =
-    ragCounts.red > 0
-      ? { variant: 'destructive' as const, label: 'Action' }
-      : ragCounts.amber > 0
-        ? { variant: 'warning' as const, label: 'Watch' }
-        : { variant: 'success' as const, label: 'Strong' }
+  // Aggregate RAG = the worst status across all KPIs. Uses the canonical label
+  // set from components/kpis/status.ts so the "KPI Status" pill matches per-KPI
+  // pills elsewhere on the dashboard.
+  const worstRag: RAGStatus =
+    ragCounts.red > 0 ? 'red' : ragCounts.amber > 0 ? 'amber' : 'green'
+  const aggregateBadge = statusBadge(worstRag)
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
@@ -66,7 +67,7 @@ export function HeadlineCards({
         value={`${ragCounts.green}/${kpiResults.length}`}
         sub={`${ragCounts.amber} amber · ${ragCounts.red} red`}
         accentColor="gradient"
-        badge={<Badge variant={statusBadge.variant}>{statusBadge.label}</Badge>}
+        badge={<Badge variant={aggregateBadge.variant}>{aggregateBadge.label}</Badge>}
       />
     </div>
   )
