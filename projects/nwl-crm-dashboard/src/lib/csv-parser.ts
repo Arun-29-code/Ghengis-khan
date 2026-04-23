@@ -21,6 +21,13 @@ const GROUP_PATTERNS = {
 
 const KPI_CODES = new Set(KPI_CONFIG.map((k) => k.code))
 
+/**
+ * Codes that appear in the CSV but are *not* standalone payment KPIs. CRM08
+ * sub-measures (A/B/C) are parsed for the informational breakdown, then
+ * aggregated into the single CRM08 payment KPI after the main parse loop.
+ */
+const SUB_MEASURE_CODES = new Set(['CRM08A', 'CRM08B', 'CRM08C'])
+
 type CodeMapping = { kpi: string; isDenominator: boolean }
 
 function extractCode(raw: string): string {
@@ -30,9 +37,12 @@ function extractCode(raw: string): string {
 function codeToKPI(code: string): CodeMapping | null {
   if (code === CRM06_NUMERATOR_CODE) return { kpi: 'CRM06', isDenominator: false }
   if (KPI_CODES.has(code)) return { kpi: code, isDenominator: false }
+  if (SUB_MEASURE_CODES.has(code)) return { kpi: code, isDenominator: false }
   if (code.endsWith('D')) {
     const base = code.slice(0, -1)
-    if (KPI_CODES.has(base)) return { kpi: base, isDenominator: true }
+    if (KPI_CODES.has(base) || SUB_MEASURE_CODES.has(base)) {
+      return { kpi: base, isDenominator: true }
+    }
   }
   return null
 }
@@ -133,12 +143,50 @@ export function parseEMISCSV(csvText: string): ParseResult {
 
   const weekNumber = calculateWeekNumber(new Date().toISOString())
 
+  // Post-process CRM08: pull the three sub-measures out of kpiRows into their
+  // own breakdown structure, then synthesise the combined CRM08 payment KPI.
+  const crm08A = kpiRows['CRM08A']
+  const crm08B = kpiRows['CRM08B']
+  const crm08C = kpiRows['CRM08C']
+  const crm08Breakdown =
+    crm08A || crm08B || crm08C
+      ? {
+          activity: crm08A ?? { numerator: 0, denominator: 0 },
+          bmi:      crm08B ?? { numerator: 0, denominator: 0 },
+          smoking:  crm08C ?? { numerator: 0, denominator: 0 },
+        }
+      : undefined
+
+  if (crm08Breakdown) {
+    const g12 = (groupSplit.group1 ?? 0) + (groupSplit.group2 ?? 0)
+    const sumNum =
+      crm08Breakdown.activity.numerator +
+      crm08Breakdown.bmi.numerator +
+      crm08Breakdown.smoking.numerator
+    // If we don't yet know G1/G2 (they come in later after manual entry), keep
+    // denominator at 0 — the UI will show "awaiting data" until groups land.
+    kpiRows['CRM08'] = { numerator: sumNum, denominator: g12 }
+  }
+  delete kpiRows['CRM08A']
+  delete kpiRows['CRM08B']
+  delete kpiRows['CRM08C']
+
+  // CRM09 denominator is G1+G2 per spec, not CRM09D from the CSV.
+  if (kpiRows['CRM09']) {
+    const g12 = (groupSplit.group1 ?? 0) + (groupSplit.group2 ?? 0)
+    kpiRows['CRM09'] = {
+      numerator: kpiRows['CRM09'].numerator,
+      denominator: g12 || kpiRows['CRM09'].denominator,
+    }
+  }
+
   return {
     success: true,
     data: {
       lastRunTimestamp,
       populationCount,
       kpiRows,
+      crm08Breakdown,
       groupSplit,
       weekNumber,
       reportType,

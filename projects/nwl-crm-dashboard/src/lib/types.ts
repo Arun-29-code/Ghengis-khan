@@ -41,6 +41,17 @@ export interface GroupSplit {
   group3: number // Lower risk patients (£24.09/yr) — derived or uploaded
 }
 
+export interface SubMeasure {
+  numerator: number
+  denominator: number
+}
+
+export interface CRM08Breakdown {
+  activity: SubMeasure // CRM08A: active-codes recorded
+  bmi: SubMeasure      // CRM08B: BMI-improvement recorded
+  smoking: SubMeasure  // CRM08C: non/ex-smoker recorded
+}
+
 export interface CSVUpload {
   practiceCode: string
   practiceName: string
@@ -49,6 +60,8 @@ export interface CSVUpload {
   populationCount: number
   rawRows: Record<string, number> // code → count (all parsed rows)
   kpiRows: Record<string, { numerator: number; denominator: number }>
+  /** Informational breakdown of CRM08 sub-measures (not a separate KPI for payment). */
+  crm08Breakdown?: CRM08Breakdown
   groupSplit: GroupSplit
   lastRunTimestamp: string
   reportType: ReportType
@@ -75,6 +88,7 @@ export interface ParseResult {
     lastRunTimestamp: string
     populationCount: number
     kpiRows: Record<string, { numerator: number; denominator: number }>
+    crm08Breakdown?: CRM08Breakdown
     groupSplit: {
       group1: number | null
       group2: number | null

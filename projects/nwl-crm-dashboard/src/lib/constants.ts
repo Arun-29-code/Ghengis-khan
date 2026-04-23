@@ -22,10 +22,13 @@ export const KPI_CONFIG: KPIConfig[] = [
   { code: 'CRM05',  label: 'ACEI/ARB',              short: 'ACEI/ARB',  t100: 66.1, t50: 65.6, weight: 5,  type: 'S', group: '0306' },
   { code: 'CRM06',  label: 'SGLT-2 Inhibitor',      short: 'SGLT-2',    t100: 42.5, t50: 38.8, weight: 5,  type: 'S', group: '0306' },
   { code: 'CRM07',  label: 'Holistic Care Plan',    short: 'Care Plan', t100: 50.0, t50: 30.0, weight: 30, type: 'C', group: '07' },
-  { code: 'CRM08A', label: 'Physical Activity Impr.', short: 'Activity', t100: 2.5, t50: 2.0, weight: 0, type: 'C', group: '0809' },
-  { code: 'CRM08B', label: 'BMI Improvement',        short: 'BMI',       t100: 2.5, t50: 2.0, weight: 0, type: 'C', group: '0809' },
-  { code: 'CRM08C', label: 'Smoking Cessation',      short: 'Smoking',   t100: 2.5, t50: 2.0, weight: 5, type: 'C', group: '0809' },
-  { code: 'CRM09',  label: 'Health Confidence',      short: 'HCS',       t100: 50.0, t50: 30.0, weight: 5, type: 'C', group: '0809' },
+  // CRM08 is ONE payment KPI. Denominator is G1+G2; numerator is the sum of
+  // the three sub-measure numerators (activity / BMI / smoking). The three
+  // sub-measures are informational and live on CSVUpload.crm08Breakdown.
+  { code: 'CRM08',  label: 'Lifestyle Improvement', short: 'Lifestyle', t100: 2.5,  t50: 2.0,  weight: 5,  type: 'C', group: '0809' },
+  // CRM09 denominator is also G1+G2 (spec) — the parser overrides what the CSV
+  // lists (CRM09D), which is the high/moderate register, not what gets paid on.
+  { code: 'CRM09',  label: 'Health Confidence',     short: 'HCS',       t100: 50.0, t50: 30.0, weight: 5,  type: 'C', group: '0809' },
 ]
 
 // Invariant: weights must sum to 100. Crash loud at import time if a config typo drifts it.

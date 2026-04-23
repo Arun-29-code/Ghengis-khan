@@ -5,6 +5,7 @@ import { KPISection } from './KPISection'
 import { KPISmallCard } from './KPISmallCard'
 import { KPIWideCard } from './KPIWideCard'
 import { KPIHBarRow } from './KPIHBarRow'
+import { CRM08Card } from './CRM08Card'
 import { CSVUploadButton } from '@/components/ui/CSVUploadButton'
 import { useDashboardStore } from '@/hooks/useDashboardStore'
 import type { KPIResult, ParseResult, RAGStatus } from '@/lib/types'
@@ -42,6 +43,7 @@ export function KPITab({ onUpload }: KPITabProps) {
   const results = useDashboardStore((s) => s.kpiResults)
   const yearEndUpload = useDashboardStore((s) => s.yearEndUpload)
   const todayUpload = useDashboardStore((s) => s.todayUpload)
+  const crm08Breakdown = yearEndUpload?.crm08Breakdown ?? null
 
   if (!yearEndUpload && !todayUpload) {
     return (
@@ -66,7 +68,9 @@ export function KPITab({ onUpload }: KPITabProps) {
   const careProcess  = pickByCodes(results, ['CRM02'])
   const outcomes     = pickByCodes(results, ['CRM03', 'CRM04', 'CRM05', 'CRM06'])
   const carePlan     = pickByCodes(results, ['CRM07'])
-  const conversations = pickByCodes(results, ['CRM08A', 'CRM08B', 'CRM08C', 'CRM09'])
+  const [crm08]      = pickByCodes(results, ['CRM08'])
+  const [crm09]      = pickByCodes(results, ['CRM09'])
+  const conversations = [crm08, crm09].filter(Boolean) as KPIResult[]
 
   return (
     <div className="space-y-6">
@@ -129,14 +133,13 @@ export function KPITab({ onUpload }: KPITabProps) {
       <KPISection
         id={KPI_SECTION_IDS.conversations}
         title="Conversations & Habits — CRM08 / CRM09"
-        subtitle="Physical activity, BMI, smoking cessation, and patient-reported confidence"
+        subtitle="Lifestyle improvement (activity / BMI / smoking) and patient-reported confidence"
         tariffLabel="10% of contract"
         rag={worstRAG(conversations)}
       >
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {conversations.map((r) => (
-            <KPISmallCard key={r.code} result={r} />
-          ))}
+        <div className="space-y-3">
+          {crm08 ? <CRM08Card result={crm08} breakdown={crm08Breakdown} /> : null}
+          {crm09 ? <KPIWideCard result={crm09} /> : null}
         </div>
       </KPISection>
     </div>

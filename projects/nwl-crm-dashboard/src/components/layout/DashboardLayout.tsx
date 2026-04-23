@@ -62,6 +62,26 @@ export function DashboardLayout({
 
   const finalizeUpload = useCallback(
     (data: NonNullable<ParseResult['data']>, split: GroupSplit) => {
+      // If Group 1/2 were just entered by hand via the GroupSplitEntry modal,
+      // we need to rebuild the aggregated CRM08 and overridden CRM09 denominators
+      // now that G1+G2 is finally known. The parser can't do it upfront if the
+      // groups weren't in the CSV.
+      const kpiRows = { ...data.kpiRows }
+      const g12 = split.group1 + split.group2
+      if (data.crm08Breakdown && g12 > 0) {
+        const sumNum =
+          data.crm08Breakdown.activity.numerator +
+          data.crm08Breakdown.bmi.numerator +
+          data.crm08Breakdown.smoking.numerator
+        kpiRows['CRM08'] = { numerator: sumNum, denominator: g12 }
+      }
+      if (kpiRows['CRM09'] && g12 > 0) {
+        kpiRows['CRM09'] = {
+          numerator: kpiRows['CRM09'].numerator,
+          denominator: g12,
+        }
+      }
+
       const upload: CSVUpload = {
         practiceCode: practiceOds,
         practiceName,
@@ -69,7 +89,8 @@ export function DashboardLayout({
         weekNumber: data.weekNumber,
         populationCount: data.populationCount,
         lastRunTimestamp: data.lastRunTimestamp,
-        kpiRows: data.kpiRows,
+        kpiRows,
+        crm08Breakdown: data.crm08Breakdown,
         rawRows: {},
         groupSplit: split,
         reportType: data.reportType,
