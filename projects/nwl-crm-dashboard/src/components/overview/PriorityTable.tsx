@@ -21,7 +21,20 @@ export function PriorityTable({ results }: PriorityTableProps) {
     bucket,
     rows: results
       .filter((r) => r.revenueBucket === bucket)
-      .sort((a, b) => b.revenue - a.revenue),
+      .sort((a, b) => {
+        // CRM01A–E (Detection — disease register coding, 4% each) are always
+        // shown at the bottom of their bucket regardless of revenue. Arun's
+        // call: they're the lowest-urgency row-by-row items, and grouping them
+        // together at the end keeps the table's top focused on the heavy-weight
+        // care/process KPIs.
+        const aDetection = a.code.startsWith('CRM01')
+        const bDetection = b.code.startsWith('CRM01')
+        if (aDetection !== bDetection) return aDetection ? 1 : -1
+        // Within the Detection sub-group keep alphabetical (A → E).
+        if (aDetection && bDetection) return a.code.localeCompare(b.code)
+        // Everything else: highest £ at stake first.
+        return b.revenue - a.revenue
+      }),
   })).filter((g) => g.rows.length > 0)
 
   return (
