@@ -34,7 +34,11 @@ export function KPIHBarRow({ result, className }: KPIHBarRowProps) {
   return (
     <div
       className={cn(
-        'grid grid-cols-1 items-center gap-x-5 gap-y-2 rounded-lg border border-border bg-card p-4 shadow-sm sm:grid-cols-[180px_1fr_auto]',
+        // Fixed column widths so every CRM01 row has an identical bar region.
+        // When the right-hand column auto-sized, "Behind Pace" (11 chars) vs
+        // "On Track" (8 chars) gave bars of subtly different widths — and the
+        // target tick at 85% lost vertical alignment between rows.
+        'grid grid-cols-1 items-center gap-x-5 gap-y-2 rounded-lg border border-border bg-card p-4 shadow-sm sm:grid-cols-[180px_1fr_260px]',
         className,
       )}
     >
