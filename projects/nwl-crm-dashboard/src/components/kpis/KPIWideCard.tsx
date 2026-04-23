@@ -1,7 +1,7 @@
 import { Badge } from '@/components/ui/Badge'
 import { GaugeSVG } from './GaugeSVG'
 import { cn, fmt } from '@/lib/utils'
-import { deriveStatusBadge, RAG_COLOR } from './status'
+import { statusBadge, RAG_COLOR } from './status'
 import type { KPIResult } from '@/lib/types'
 
 interface KPIWideCardProps {
@@ -10,7 +10,7 @@ interface KPIWideCardProps {
 }
 
 export function KPIWideCard({ result, className }: KPIWideCardProps) {
-  const badge = deriveStatusBadge(result.paymentBand, result.ragStatus)
+  const badge = statusBadge(result.ragStatus)
   const hasData = result.denominator > 0
 
   return (

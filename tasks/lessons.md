@@ -19,6 +19,12 @@ Each lesson follows this structure:
 
 ## Lessons log
 
+### 2026-04-23 — Invented status-pill labels instead of asking
+- **What happened**: The Priority Table on the Overview tab shipped with literal `Green / Amber / Red` pill labels, while the KPI cards used `On track / At risk / Behind` and the H-bar rows used yet another variant. Spec §15 only named one label explicitly ("Payment Secured" for green-band KPIs); I paraphrased the others inconsistently across four components. Arun corrected to a canonical set: *Payment Secured / On Track / Behind Pace* — and asked me to learn from it.
+- **Why it happened**: Two failures chained. (1) I invented labels where the spec was silent rather than asking. (2) I let sibling components grow their own inline `RAG_BADGE` maps instead of importing from a shared module — so when the wording drifted, it drifted in different directions in each file.
+- **The rule going forward**: When rendering the same concept across multiple components (status pills, badges, section headers), route every lookup through a single module (e.g. `src/components/kpis/status.ts`). Never paraphrase a label inline. When a spec names one label in a set and is silent on the others, flag the gap in the plan check-in and ask before inventing. Also captured as a cross-project feedback memory (`feedback_spec_labels.md`).
+- **Tags**: `#ux` `#consistency` `#spec-review`
+
 ### 2026-04-22 — Audit specs for UX basics the spec itself missed
 - **What happened**: Built the NWL CRM Dashboard exactly per spec §10.2. Auth worked, upload worked, everything in the spec worked. But the spec didn't include a logout button anywhere in the sidebar or topbar — no way to end a session. Arun noticed post-build while browser-testing and asked me to save the lesson.
 - **Why it happened**: I treated the spec as authoritative for MVP scope. I *did* audit for tech mismatches (Next 14→16, Tailwind 3→4, Recharts 2→3) and internal contradictions (CRM01A RAG logic) — but didn't audit for *missing* UX table stakes. Sign-out on an auth'd app is the kind of thing that should always exist whether the spec names it or not.

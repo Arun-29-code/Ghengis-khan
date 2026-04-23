@@ -1,5 +1,5 @@
 import type { BadgeVariant } from '@/components/ui/Badge'
-import type { PaymentBand, RAGStatus } from '@/lib/types'
+import type { RAGStatus } from '@/lib/types'
 
 export const RAG_COLOR: Record<RAGStatus, string> = {
   green: 'var(--color-success)',
@@ -7,29 +7,26 @@ export const RAG_COLOR: Record<RAGStatus, string> = {
   red:   'var(--color-destructive)',
 }
 
-interface StatusBadge {
+export interface StatusBadge {
   variant: Extract<BadgeVariant, 'success' | 'warning' | 'destructive'>
   label: string
 }
 
-const RAG_BADGE: Record<RAGStatus, StatusBadge> = {
-  green: { variant: 'success',     label: 'On track' },
-  amber: { variant: 'warning',     label: 'At risk'  },
-  red:   { variant: 'destructive', label: 'Behind'   },
+/**
+ * Canonical RAG → pill mapping. One source of truth for every status badge
+ * in the dashboard (Overview priority table, KPI cards, KPI section headers,
+ * horizontal-bar rows). Wording decided by Arun:
+ *   green  → "Payment Secured"
+ *   amber  → "On Track"
+ *   red    → "Behind Pace"
+ * Do not paraphrase these labels elsewhere — import from here instead.
+ */
+export const STATUS_BADGE: Record<RAGStatus, StatusBadge> = {
+  green: { variant: 'success',     label: 'Payment Secured' },
+  amber: { variant: 'warning',     label: 'On Track'        },
+  red:   { variant: 'destructive', label: 'Behind Pace'     },
 }
 
-/**
- * Badge priority:
- *  - paymentBand 'full' → green "Payment Secured" (spec §15 expects this literal
- *    wording when a KPI has crossed its 100% pay threshold).
- *  - otherwise, fall back to the RAG status label.
- */
-export function deriveStatusBadge(
-  paymentBand: PaymentBand,
-  rag: RAGStatus,
-): StatusBadge {
-  if (paymentBand === 'full') {
-    return { variant: 'success', label: 'Payment Secured' }
-  }
-  return RAG_BADGE[rag]
+export function statusBadge(rag: RAGStatus): StatusBadge {
+  return STATUS_BADGE[rag]
 }

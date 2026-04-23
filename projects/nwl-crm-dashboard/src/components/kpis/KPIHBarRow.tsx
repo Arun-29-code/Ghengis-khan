@@ -1,5 +1,6 @@
 import { Badge } from '@/components/ui/Badge'
 import { cn, fmt } from '@/lib/utils'
+import { statusBadge } from './status'
 import type { KPIResult, RAGStatus } from '@/lib/types'
 
 interface KPIHBarRowProps {
@@ -13,19 +14,13 @@ const RAG_BG: Record<RAGStatus, string> = {
   red:   'bg-destructive',
 }
 
-const RAG_BADGE: Record<RAGStatus, { variant: 'success' | 'warning' | 'destructive'; label: string }> = {
-  green: { variant: 'success',     label: 'On track' },
-  amber: { variant: 'warning',     label: 'At risk'  },
-  red:   { variant: 'destructive', label: 'Behind'   },
-}
-
 // Fixed "finish line" position across all CRM01 bars, regardless of each KPI's
 // underlying target %. Reaching t100 fills the bar to this mark; overshoot fills
 // the remaining 15% up to 100% of the track.
 const TARGET_POSITION_PCT = 85
 
 export function KPIHBarRow({ result, className }: KPIHBarRowProps) {
-  const badge = RAG_BADGE[result.ragStatus]
+  const badge = statusBadge(result.ragStatus)
   const hasData = result.denominator > 0
 
   const progressRatio = result.t100 > 0 ? result.current / result.t100 : 0

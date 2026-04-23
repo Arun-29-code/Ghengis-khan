@@ -1,7 +1,8 @@
 import { Fragment } from 'react'
 import { Badge } from '@/components/ui/Badge'
 import { cn, fmt } from '@/lib/utils'
-import type { KPIResult, RAGStatus, RevenueBucket } from '@/lib/types'
+import { statusBadge } from '@/components/kpis/status'
+import type { KPIResult, RevenueBucket } from '@/lib/types'
 
 interface PriorityTableProps {
   results: KPIResult[]
@@ -13,15 +14,6 @@ const BUCKET_LABEL: Record<RevenueBucket, string> = {
   atRisk:   'Needs action',
   onTarget: 'On target',
   secured:  'Secured',
-}
-
-const RAG_BADGE: Record<
-  RAGStatus,
-  { variant: 'success' | 'warning' | 'destructive'; label: string }
-> = {
-  green: { variant: 'success',     label: 'Green' },
-  amber: { variant: 'warning',     label: 'Amber' },
-  red:   { variant: 'destructive', label: 'Red'   },
 }
 
 export function PriorityTable({ results }: PriorityTableProps) {
@@ -68,7 +60,7 @@ export function PriorityTable({ results }: PriorityTableProps) {
                   </td>
                 </tr>
                 {group.rows.map((r) => {
-                  const badge = RAG_BADGE[r.ragStatus]
+                  const badge = statusBadge(r.ragStatus)
                   return (
                     <tr key={r.code} className="border-t border-border">
                       <td className="px-4 py-2 font-mono text-xs text-foreground">

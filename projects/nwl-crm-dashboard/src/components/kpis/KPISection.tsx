@@ -1,19 +1,8 @@
 import type { ReactNode } from 'react'
 import { cn } from '@/lib/utils'
-import { Badge, type BadgeVariant } from '@/components/ui/Badge'
+import { Badge } from '@/components/ui/Badge'
+import { statusBadge } from './status'
 import type { RAGStatus } from '@/lib/types'
-
-const RAG_TO_BADGE: Record<RAGStatus, BadgeVariant> = {
-  green: 'success',
-  amber: 'warning',
-  red:   'destructive',
-}
-
-const RAG_LABEL: Record<RAGStatus, string> = {
-  green: 'On track',
-  amber: 'At risk',
-  red:   'Behind',
-}
 
 interface KPISectionProps {
   id?: string
@@ -46,7 +35,9 @@ export function KPISection({
         <div>
           <div className="flex items-center gap-2">
             <h2 className="text-base font-semibold text-foreground">{title}</h2>
-            {rag ? <Badge variant={RAG_TO_BADGE[rag]}>{RAG_LABEL[rag]}</Badge> : null}
+            {rag ? (
+              <Badge variant={statusBadge(rag).variant}>{statusBadge(rag).label}</Badge>
+            ) : null}
           </div>
           {subtitle ? (
             <p className="mt-0.5 text-xs text-muted-foreground">{subtitle}</p>
