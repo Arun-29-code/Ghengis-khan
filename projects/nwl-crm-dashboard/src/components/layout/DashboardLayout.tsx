@@ -144,6 +144,16 @@ export function DashboardLayout({
     [finalizeUpload],
   )
 
+  // Top-level tab changes (TopBar tabs + Sidebar main nav) should always land
+  // the user at the top of the new tab's content. The sub-nav "jump to section"
+  // handler below bypasses this — it targets a specific section, not the top.
+  const handleTabChange = useCallback((id: TabId) => {
+    setActiveTab(id)
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    })
+  }, [])
+
   const handleNavigateToSection = useCallback((sectionId: string) => {
     setActiveTab('kpis')
     requestAnimationFrame(() => {
@@ -159,7 +169,7 @@ export function DashboardLayout({
     <div className="flex min-h-screen">
       <Sidebar
         activeTab={activeTab}
-        onTabChange={setActiveTab}
+        onTabChange={handleTabChange}
         onNavigateToSection={handleNavigateToSection}
         practiceName={practiceName}
         pcnName={pcnName}
@@ -169,7 +179,7 @@ export function DashboardLayout({
       <div className="flex flex-1 flex-col">
         <TopBar
           activeTab={activeTab}
-          onTabChange={setActiveTab}
+          onTabChange={handleTabChange}
           dateBadgeLabel={dateBadgeLabel}
           trailingSlot={<CSVUploadButton onUpload={handleUpload} size="md" />}
         />
