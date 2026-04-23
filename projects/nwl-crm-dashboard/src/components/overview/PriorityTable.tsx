@@ -2,6 +2,7 @@ import { Fragment } from 'react'
 import { Badge } from '@/components/ui/Badge'
 import { cn, fmt } from '@/lib/utils'
 import { statusBadge } from '@/components/kpis/status'
+import { KPI_CONFIG } from '@/lib/constants'
 import type { KPIResult, RevenueBucket } from '@/lib/types'
 
 interface PriorityTableProps {
@@ -16,25 +17,19 @@ const BUCKET_LABEL: Record<RevenueBucket, string> = {
   secured:  'Secured',
 }
 
+// Within each bucket, rows are shown in the same top-to-bottom order as the
+// KPI Performance tab sections (CRM01A → CRM01E → CRM02 → CRM03 → CRM04 →
+// CRM05 → CRM06 → CRM07 → CRM08 → CRM09). Pulling the order off KPI_CONFIG
+// means any future reorder of sections stays in sync for free.
+const CODE_ORDER_INDEX = new Map(KPI_CONFIG.map((k, i) => [k.code, i]))
+const orderIndex = (code: string) => CODE_ORDER_INDEX.get(code) ?? Number.MAX_SAFE_INTEGER
+
 export function PriorityTable({ results }: PriorityTableProps) {
   const groups = BUCKET_ORDER.map((bucket) => ({
     bucket,
     rows: results
       .filter((r) => r.revenueBucket === bucket)
-      .sort((a, b) => {
-        // CRM01A–E (Detection — disease register coding, 4% each) are always
-        // shown at the bottom of their bucket regardless of revenue. Arun's
-        // call: they're the lowest-urgency row-by-row items, and grouping them
-        // together at the end keeps the table's top focused on the heavy-weight
-        // care/process KPIs.
-        const aDetection = a.code.startsWith('CRM01')
-        const bDetection = b.code.startsWith('CRM01')
-        if (aDetection !== bDetection) return aDetection ? 1 : -1
-        // Within the Detection sub-group keep alphabetical (A → E).
-        if (aDetection && bDetection) return a.code.localeCompare(b.code)
-        // Everything else: highest £ at stake first.
-        return b.revenue - a.revenue
-      }),
+      .sort((a, b) => orderIndex(a.code) - orderIndex(b.code)),
   })).filter((g) => g.rows.length > 0)
 
   return (
@@ -42,7 +37,7 @@ export function PriorityTable({ results }: PriorityTableProps) {
       <div className="border-b border-border px-5 py-4">
         <h3 className="text-sm font-semibold text-foreground">Priority list</h3>
         <p className="text-xs text-muted-foreground">
-          All {results.length} KPIs ordered by urgency bucket and £ at stake
+          All {results.length} KPIs grouped by urgency bucket, in KPI Performance order
         </p>
       </div>
 
