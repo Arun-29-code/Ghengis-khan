@@ -145,9 +145,13 @@ export const useDashboardStore = create<DashboardStore>()(
       },
     }),
     {
-      // Bump the store name (v1 → v2) so any previously-persisted single-slot
-      // state is effectively discarded rather than reloaded into the new shape.
-      name: 'nwl-crm-dashboard-v2',
+      // Bump the store name whenever the persisted shape changes:
+      //   v1 → v2: single-upload → two-slot (year-end + today)
+      //   v2 → v3: CRM08 merged (kpiRows now has CRM08, not CRM08A/B/C; plus
+      //            new crm08Breakdown field on CSVUpload).
+      // This discards any stale state rather than silently rehydrating it into
+      // a shape the engine no longer understands.
+      name: 'nwl-crm-dashboard-v3',
       storage: createJSONStorage(() => localStorage),
       skipHydration: true,
     },
