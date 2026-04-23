@@ -40,9 +40,10 @@ function pickByCodes(results: KPIResult[], codes: string[]): KPIResult[] {
 
 export function KPITab({ onUpload }: KPITabProps) {
   const results = useDashboardStore((s) => s.kpiResults)
-  const currentUpload = useDashboardStore((s) => s.currentUpload)
+  const yearEndUpload = useDashboardStore((s) => s.yearEndUpload)
+  const todayUpload = useDashboardStore((s) => s.todayUpload)
 
-  if (!currentUpload || results.length === 0) {
+  if (!yearEndUpload && !todayUpload) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="w-full max-w-md rounded-xl border border-border bg-card p-10 text-center shadow-sm">

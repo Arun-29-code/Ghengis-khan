@@ -36,19 +36,29 @@ export function DashboardLayout({
   const [pending, setPending] = useState<PendingUpload | null>(null)
   const addUpload = useDashboardStore((s) => s.addUpload)
 
-  // Zustand persist has skipHydration: true. Subscribe to onFinishHydration
-  // (so we flip hydrated from a callback, not synchronously in the effect body)
-  // and then trigger the rehydrate itself.
   useEffect(() => {
     const unsub = useDashboardStore.persist.onFinishHydration(() => setHydrated(true))
     void useDashboardStore.persist.rehydrate()
     return unsub
   }, [])
 
-  const currentUpload = useDashboardStore((s) => s.currentUpload)
-  const lastUploadLabel =
-    hydrated && currentUpload ? formatDate(currentUpload.uploadDate) : null
-  const dateBadgeLabel = lastUploadLabel ? `Uploaded ${lastUploadLabel}` : undefined
+  const yearEndUpload = useDashboardStore((s) => s.yearEndUpload)
+  const todayUpload = useDashboardStore((s) => s.todayUpload)
+
+  const yearEndDate =
+    hydrated && yearEndUpload ? formatDate(yearEndUpload.uploadDate) : null
+  const todayDate =
+    hydrated && todayUpload ? formatDate(todayUpload.uploadDate) : null
+
+  // Newer of the two for the topbar date badge.
+  const latestUploadIso =
+    hydrated
+      ? [yearEndUpload?.uploadDate, todayUpload?.uploadDate]
+          .filter((x): x is string => Boolean(x))
+          .sort()
+          .at(-1)
+      : undefined
+  const dateBadgeLabel = latestUploadIso ? `Uploaded ${formatDate(latestUploadIso)}` : undefined
 
   const finalizeUpload = useCallback(
     (data: NonNullable<ParseResult['data']>, split: GroupSplit) => {
@@ -62,6 +72,7 @@ export function DashboardLayout({
         kpiRows: data.kpiRows,
         rawRows: {},
         groupSplit: split,
+        reportType: data.reportType,
       }
       addUpload(upload)
       setPending(null)
@@ -77,10 +88,18 @@ export function DashboardLayout({
         setError(result.error ?? 'Failed to parse CSV')
         return
       }
-      const { groupSplit, kpiRows } = result.data
-      const crmRegisterSize = kpiRows.CRM02?.denominator ?? 0
+      const data = result.data
 
-      // Derive Group 3 if missing but G1 and G2 are known (spec §7.5).
+      // Today's report has no Group 1/2/3 rows by design — short-circuit the
+      // groupSplit check. Store will merge with the yearEnd slot's groupSplit.
+      if (data.reportType === 'today') {
+        finalizeUpload(data, { group1: 0, group2: 0, group3: 0 })
+        return
+      }
+
+      // Year-end path: derive Group 3 if missing, else prompt for G1/G2.
+      const { groupSplit, kpiRows } = data
+      const crmRegisterSize = kpiRows.CRM02?.denominator ?? 0
       let g3 = groupSplit.group3
       if (g3 === null && groupSplit.group1 !== null && groupSplit.group2 !== null) {
         g3 = Math.max(0, crmRegisterSize - groupSplit.group1 - groupSplit.group2)
@@ -91,33 +110,28 @@ export function DashboardLayout({
         groupSplit.group2 !== null &&
         g3 !== null
       ) {
-        finalizeUpload(result.data, {
+        finalizeUpload(data, {
           group1: groupSplit.group1,
           group2: groupSplit.group2,
           group3: g3,
         })
       } else {
-        setPending({ data: result.data, crmRegisterSize })
+        setPending({ data, crmRegisterSize })
       }
     },
     [finalizeUpload],
   )
 
-  const handleNavigateToSection = useCallback(
-    (sectionId: string) => {
-      // Tab switch is a no-op if already on kpis. scrollIntoView happens after
-      // the next paint so the section has actually rendered.
-      setActiveTab('kpis')
-      requestAnimationFrame(() => {
-        const el = document.getElementById(sectionId)
-        if (!el) return
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-        el.classList.add('animate-nav-flash')
-        window.setTimeout(() => el.classList.remove('animate-nav-flash'), 1200)
-      })
-    },
-    [],
-  )
+  const handleNavigateToSection = useCallback((sectionId: string) => {
+    setActiveTab('kpis')
+    requestAnimationFrame(() => {
+      const el = document.getElementById(sectionId)
+      if (!el) return
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      el.classList.add('animate-nav-flash')
+      window.setTimeout(() => el.classList.remove('animate-nav-flash'), 1200)
+    })
+  }, [])
 
   return (
     <div className="flex min-h-screen">
@@ -127,7 +141,8 @@ export function DashboardLayout({
         onNavigateToSection={handleNavigateToSection}
         practiceName={practiceName}
         pcnName={pcnName}
-        lastUploadLabel={lastUploadLabel}
+        yearEndDate={yearEndDate}
+        todayDate={todayDate}
       />
       <div className="flex flex-1 flex-col">
         <TopBar
@@ -168,4 +183,3 @@ export function DashboardLayout({
     </div>
   )
 }
-

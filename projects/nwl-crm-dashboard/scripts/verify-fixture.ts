@@ -100,6 +100,7 @@ const fixture: CSVUpload = {
   weekNumber: WEEK_NUMBER,
   populationCount: 15986,
   lastRunTimestamp: '17/04/2026 17:03',
+  reportType: 'year-end',
   groupSplit: { group1: 495, group2: 357, group3: 2454 },
   rawRows: {},
   kpiRows: {

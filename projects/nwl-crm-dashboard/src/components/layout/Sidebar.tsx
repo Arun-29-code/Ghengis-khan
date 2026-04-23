@@ -52,7 +52,8 @@ interface SidebarProps {
   onNavigateToSection: (sectionId: string) => void
   practiceName: string
   pcnName?: string
-  lastUploadLabel: string | null
+  yearEndDate: string | null
+  todayDate: string | null
 }
 
 export function Sidebar({
@@ -61,7 +62,8 @@ export function Sidebar({
   onNavigateToSection,
   practiceName,
   pcnName,
-  lastUploadLabel,
+  yearEndDate,
+  todayDate,
 }: SidebarProps) {
   return (
     <aside className="sticky top-0 flex h-screen w-60 shrink-0 flex-col bg-sidebar-gradient text-white">
@@ -127,14 +129,11 @@ export function Sidebar({
       </nav>
 
       <div className="border-t border-white/10 px-5 py-4 text-xs text-white/60">
-        {lastUploadLabel ? (
-          <>
-            <p className="font-semibold text-white/80">Last upload</p>
-            <p>{lastUploadLabel}</p>
-          </>
-        ) : (
-          <p>No uploads yet</p>
-        )}
+        <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-white/50">
+          Reports
+        </p>
+        <ReportRow label="Year-end" date={yearEndDate} />
+        <ReportRow label="Today" date={todayDate} />
         <form action={signOutAction} className="mt-3 border-t border-white/10 pt-3">
           <button
             type="submit"
@@ -146,5 +145,21 @@ export function Sidebar({
         </form>
       </div>
     </aside>
+  )
+}
+
+function ReportRow({ label, date }: { label: string; date: string | null }) {
+  return (
+    <div className="flex items-baseline justify-between gap-2 text-[11px] leading-5">
+      <span className="text-white/60">{label}</span>
+      <span
+        className={cn(
+          'tabular-nums',
+          date ? 'text-white/85 font-medium' : 'text-white/40 italic',
+        )}
+      >
+        {date ?? 'not loaded'}
+      </span>
+    </div>
   )
 }

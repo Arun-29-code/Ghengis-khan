@@ -2,6 +2,7 @@ export type KPIType = 'C' | 'S' // Cumulative vs Static
 export type RAGStatus = 'green' | 'amber' | 'red'
 export type PaymentBand = 'full' | 'half' | 'none'
 export type RevenueBucket = 'secured' | 'onTarget' | 'atRisk'
+export type ReportType = 'year-end' | 'today' | 'unknown'
 
 export interface KPIConfig {
   code: string // e.g. 'CRM01A'
@@ -50,12 +51,15 @@ export interface CSVUpload {
   kpiRows: Record<string, { numerator: number; denominator: number }>
   groupSplit: GroupSplit
   lastRunTimestamp: string
+  reportType: ReportType
 }
 
 export interface DashboardState {
-  currentUpload: CSVUpload | null
-  previousUpload: CSVUpload | null // for week-on-week delta
-  uploadHistory: CSVUpload[] // all uploads, newest first
+  // Two slots — each EMIS report covers a different set of KPIs.
+  yearEndUpload: CSVUpload | null   // CRM01-03, 07, 08, 09 + Group 1/2/3
+  yearEndPrevious: CSVUpload | null // previous year-end for delta
+  todayUpload: CSVUpload | null     // CRM04-06 (current prescribing state)
+  todayPrevious: CSVUpload | null   // previous today for delta
   kpiResults: KPIResult[]
   totalRevenue: number
   securedRevenue: number
@@ -77,6 +81,7 @@ export interface ParseResult {
       group3: number | null
     }
     weekNumber: number
+    reportType: ReportType
   }
 }
 

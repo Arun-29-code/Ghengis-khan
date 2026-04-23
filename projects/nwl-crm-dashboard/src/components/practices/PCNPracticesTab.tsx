@@ -9,7 +9,7 @@ interface PCNPracticesTabProps {
 }
 
 export function PCNPracticesTab({ currentOds }: PCNPracticesTabProps) {
-  const currentUpload = useDashboardStore((s) => s.currentUpload)
+  const yearEndUpload = useDashboardStore((s) => s.yearEndUpload)
   const totalRevenue = useDashboardStore((s) => s.totalRevenue)
   const securedRevenue = useDashboardStore((s) => s.securedRevenue)
   const atRiskRevenue = useDashboardStore((s) => s.atRiskRevenue)
@@ -32,11 +32,11 @@ export function PCNPracticesTab({ currentOds }: PCNPracticesTabProps) {
               key={`${p.name}-${p.ods ?? 'none'}`}
               practice={p}
               isCurrent={isCurrent}
-              uploadDate={isCurrent ? currentUpload?.uploadDate : undefined}
+              uploadDate={isCurrent ? yearEndUpload?.uploadDate : undefined}
               totalRevenue={isCurrent ? totalRevenue : undefined}
               securedRevenue={isCurrent ? securedRevenue : undefined}
               atRiskRevenue={isCurrent ? atRiskRevenue : undefined}
-              weekNumber={isCurrent ? currentUpload?.weekNumber : undefined}
+              weekNumber={isCurrent ? yearEndUpload?.weekNumber : undefined}
             />
           )
         })}
