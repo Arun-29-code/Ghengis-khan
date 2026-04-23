@@ -8,6 +8,7 @@ import { GroupSplitEntry } from '@/components/overview/GroupSplitEntry'
 import { KPITab } from '@/components/kpis/KPITab'
 import { FinancialsTab } from '@/components/financials/FinancialsTab'
 import { PCNPracticesTab } from '@/components/practices/PCNPracticesTab'
+import { GroupRegisterBanner } from '@/components/dashboard/GroupRegisterBanner'
 import { useDashboardStore } from '@/hooks/useDashboardStore'
 import { formatDate } from '@/lib/utils'
 import type { CSVUpload, GroupSplit, ParseResult } from '@/lib/types'
@@ -190,17 +191,30 @@ export function DashboardLayout({
               onConfirm={(split) => finalizeUpload(pending.data, split)}
               onCancel={() => setPending(null)}
             />
-          ) : activeTab === 'overview' ? (
-            <OverviewTab onUpload={handleUpload} />
-          ) : activeTab === 'kpis' ? (
-            <KPITab onUpload={handleUpload} />
-          ) : activeTab === 'financials' ? (
-            <FinancialsTab onUpload={handleUpload} />
           ) : (
-            <PCNPracticesTab currentOds={practiceOds} />
+            <>
+              <GroupRegisterBanner
+                group1={yearEndUpload?.groupSplit.group1 ?? null}
+                group2={yearEndUpload?.groupSplit.group2 ?? null}
+                group3={yearEndUpload?.groupSplit.group3 ?? null}
+                crmRegister={yearEndUpload?.kpiRows['CRM02']?.denominator ?? null}
+              />
+              {renderTab(activeTab, handleUpload, practiceOds)}
+            </>
           )}
         </main>
       </div>
     </div>
   )
+}
+
+function renderTab(
+  activeTab: TabId,
+  handleUpload: (result: ParseResult) => void,
+  practiceOds: string,
+) {
+  if (activeTab === 'overview') return <OverviewTab onUpload={handleUpload} />
+  if (activeTab === 'kpis') return <KPITab onUpload={handleUpload} />
+  if (activeTab === 'financials') return <FinancialsTab onUpload={handleUpload} />
+  return <PCNPracticesTab currentOds={practiceOds} />
 }
