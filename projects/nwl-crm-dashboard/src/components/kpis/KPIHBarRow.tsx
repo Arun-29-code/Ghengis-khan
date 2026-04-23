@@ -75,16 +75,12 @@ export function KPIHBarRow({ result, className }: KPIHBarRowProps) {
             style={{ left: `${TARGET_POSITION_PCT}%` }}
             aria-hidden
           />
-          <span
-            className="pointer-events-none absolute top-[-14px] -translate-x-1/2 whitespace-nowrap text-[9px] font-semibold uppercase tracking-wide text-muted-foreground"
-            style={{ left: `${TARGET_POSITION_PCT}%` }}
-            aria-hidden
-          >
-            target
-          </span>
         </div>
 
-        <div className="mt-1.5 flex flex-wrap items-baseline justify-between gap-x-3 text-xs text-muted-foreground">
+        {/* The target % is centred directly under the dashed tick (same 85% anchor)
+            so the relationship is visually obvious. The patient-count label stays
+            left-aligned in flow. */}
+        <div className="relative mt-1.5 text-xs text-muted-foreground">
           <span className="tabular-nums">
             <span className="font-semibold text-foreground">
               {hasData
@@ -93,10 +89,14 @@ export function KPIHBarRow({ result, className }: KPIHBarRowProps) {
             </span>{' '}
             patients
             {hasData && gapPatients > 0 ? (
-              <span className="ml-1 text-muted-foreground">({gapPatients.toLocaleString()} to go)</span>
+              <span className="ml-1">({gapPatients.toLocaleString()} to go)</span>
             ) : null}
           </span>
-          <span className="tabular-nums">
+          <span
+            className="absolute -translate-x-1/2 whitespace-nowrap tabular-nums"
+            style={{ left: `${TARGET_POSITION_PCT}%` }}
+            aria-hidden
+          >
             target {result.t100.toFixed(1)}%
           </span>
         </div>
