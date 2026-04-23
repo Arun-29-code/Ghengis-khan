@@ -24,8 +24,12 @@ export function KPIHBarRow({ result, className }: KPIHBarRowProps) {
   const hasData = result.denominator > 0
 
   const progressRatio = result.t100 > 0 ? result.current / result.t100 : 0
-  const progressPct = progressRatio * 100
   const fillWidthPct = Math.min(100, Math.max(0, progressRatio * TARGET_POSITION_PCT))
+  // Patients needed at t100 — absolute count the register must reach for full pay.
+  const targetPatients = hasData
+    ? Math.ceil((result.denominator * result.t100) / 100)
+    : 0
+  const gapPatients = Math.max(0, targetPatients - result.numerator)
 
   return (
     <div
@@ -83,12 +87,16 @@ export function KPIHBarRow({ result, className }: KPIHBarRowProps) {
         <div className="mt-1.5 flex flex-wrap items-baseline justify-between gap-x-3 text-xs text-muted-foreground">
           <span className="tabular-nums">
             <span className="font-semibold text-foreground">
-              {hasData ? `${progressPct.toFixed(0)}%` : '—'}
+              {hasData
+                ? `${result.numerator.toLocaleString()} of ${targetPatients.toLocaleString()}`
+                : '—'}
             </span>{' '}
-            of target
+            patients
+            {hasData && gapPatients > 0 ? (
+              <span className="ml-1 text-muted-foreground">({gapPatients.toLocaleString()} to go)</span>
+            ) : null}
           </span>
           <span className="tabular-nums">
-            {hasData ? `${result.current.toFixed(1)}% of ${result.denominator.toLocaleString()}` : '—'} ·
             target {result.t100.toFixed(1)}%
           </span>
         </div>
