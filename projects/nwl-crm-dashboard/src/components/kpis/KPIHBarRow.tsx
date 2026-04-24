@@ -1,0 +1,130 @@
+import { Badge } from '@/components/ui/Badge'
+import { cn, fmt } from '@/lib/utils'
+import { statusBadge } from './status'
+import type { KPIResult, RAGStatus } from '@/lib/types'
+
+interface KPIHBarRowProps {
+  result: KPIResult
+  className?: string
+}
+
+const RAG_BG: Record<RAGStatus, string> = {
+  green: 'bg-success',
+  amber: 'bg-warning',
+  red:   'bg-destructive',
+}
+
+// Fixed "finish line" position across all CRM01 bars, regardless of each KPI's
+// underlying target %. Reaching t100 fills the bar to this mark; overshoot fills
+// the remaining 15% up to 100% of the track.
+const TARGET_POSITION_PCT = 85
+
+export function KPIHBarRow({ result, className }: KPIHBarRowProps) {
+  const badge = statusBadge(result.ragStatus)
+  const hasData = result.denominator > 0
+
+  const progressRatio = result.t100 > 0 ? result.current / result.t100 : 0
+  const fillWidthPct = Math.min(100, Math.max(0, progressRatio * TARGET_POSITION_PCT))
+  // Patients needed at t100 — absolute count the register must reach for full pay.
+  const targetPatients = hasData
+    ? Math.ceil((result.denominator * result.t100) / 100)
+    : 0
+  const gapPatients = Math.max(0, targetPatients - result.numerator)
+
+  return (
+    <div
+      className={cn(
+        // Fixed column widths so every CRM01 row has an identical bar region.
+        // When the right-hand column auto-sized, "Behind Pace" (11 chars) vs
+        // "On Track" (8 chars) gave bars of subtly different widths — and the
+        // target tick at 85% lost vertical alignment between rows.
+        'grid grid-cols-1 items-center gap-x-5 gap-y-2 rounded-lg border border-border bg-card p-4 shadow-sm sm:grid-cols-[180px_1fr_260px]',
+        className,
+      )}
+    >
+      <div className="min-w-0">
+        <p className="font-mono text-[10.5px] font-bold uppercase tracking-[0.5px] text-muted-foreground">
+          {result.code}
+        </p>
+        <p className="truncate text-sm font-semibold text-foreground">
+          {result.short}
+          {result.isSmallRegister ? (
+            <span className="ml-2 text-[10px] font-semibold uppercase tracking-wide text-warning">
+              small
+            </span>
+          ) : null}
+        </p>
+        <p className="text-xs text-muted-foreground">{result.label}</p>
+      </div>
+
+      <div>
+        <div className="relative">
+          <div
+            className="relative h-3 w-full overflow-hidden rounded-full bg-muted"
+            aria-label={`${result.short} progress toward target`}
+            role="img"
+          >
+            <div
+              className={cn(
+                'h-full transition-[width] duration-500',
+                RAG_BG[result.ragStatus],
+              )}
+              style={{ width: `${fillWidthPct}%` }}
+            />
+          </div>
+          {/* Target "finish line" tick — fixed at the same position across all CRM01 bars.
+              Rendered outside the overflow-hidden track so it can extend above/below. */}
+          <span
+            className="pointer-events-none absolute top-[-3px] h-[calc(100%+6px)] border-l border-dashed border-foreground/70"
+            style={{ left: `${TARGET_POSITION_PCT}%` }}
+            aria-hidden
+          />
+        </div>
+
+        {/* The target % is centred directly under the dashed tick (same 85% anchor)
+            so the relationship is visually obvious. The patient-count label stays
+            left-aligned in flow. */}
+        <div className="relative mt-1.5 text-xs text-muted-foreground">
+          <span className="tabular-nums">
+            <span className="font-semibold text-foreground">
+              {hasData
+                ? `${result.numerator.toLocaleString()} of ${targetPatients.toLocaleString()}`
+                : '—'}
+            </span>{' '}
+            patients
+            {hasData && gapPatients > 0 ? (
+              <span className="ml-1">({gapPatients.toLocaleString()} to go)</span>
+            ) : null}
+          </span>
+          <span
+            className="absolute -translate-x-1/2 whitespace-nowrap tabular-nums"
+            style={{ left: `${TARGET_POSITION_PCT}%` }}
+            aria-hidden
+          >
+            target {result.t100.toFixed(1)}%
+          </span>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-3 justify-self-start sm:justify-self-end">
+        <div className="text-right text-xs">
+          <p className="text-muted-foreground">Per week</p>
+          <p className="font-semibold tabular-nums text-foreground">
+            {result.weeklyRunRate === null
+              ? 'n/a'
+              : result.weeklyRunRate > 0
+                ? result.weeklyRunRate
+                : '—'}
+          </p>
+        </div>
+        <div className="text-right text-xs">
+          <p className="text-muted-foreground">£ at stake</p>
+          <p className="font-semibold tabular-nums text-foreground">
+            {fmt(result.revenue, { currency: true })}
+          </p>
+        </div>
+        <Badge variant={badge.variant}>{badge.label}</Badge>
+      </div>
+    </div>
+  )
+}

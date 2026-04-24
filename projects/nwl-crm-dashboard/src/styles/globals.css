@@ -1,0 +1,66 @@
+/* GPA Portal design tokens — consumed by Tailwind v4 via @theme */
+
+@theme {
+  /* Palette (HSL literals so Tailwind utilities like bg-primary/50 still work) */
+  --color-background:        hsl(210 40% 98%);
+  --color-foreground:        hsl(222 47% 8%);
+  --color-primary:           hsl(213 100% 39%);   /* #0059c7 */
+  --color-primary-dark:      hsl(213 100% 29%);   /* #003d8f */
+  --color-primary-light:     hsl(213 100% 49%);   /* #1a7ce0 */
+  --color-primary-foreground: #ffffff;
+  --color-secondary:         hsl(194 100% 47%);   /* #00b7f1 */
+  --color-muted:             hsl(210 40% 96%);
+  --color-muted-foreground:  hsl(215 20% 35%);
+  --color-accent:            hsl(214 31.8% 91.4%);
+  --color-destructive:       hsl(0 84% 60%);
+  --color-success:           hsl(142 71% 45%);
+  --color-warning:           hsl(38 92% 50%);
+  --color-border:            hsl(214 32% 91%);
+  --color-card:              hsl(0 0% 100%);
+
+  /* Border radius (larger than Tailwind defaults — spec GPA tokens) */
+  --radius-sm:   0.5rem;    /* 8px  */
+  --radius:      0.75rem;   /* 12px */
+  --radius-lg:   1rem;      /* 16px */
+  --radius-xl:   1.25rem;   /* 20px */
+  --radius-full: 9999px;
+
+  /* Font */
+  --font-sans: var(--font-inter), Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+:root {
+  /* Sidebar gradient stops — used by the .bg-sidebar-gradient utility below. */
+  --sidebar-bg-from: #003d8f;
+  --sidebar-bg-to:   #002060;
+}
+
+@layer components {
+  .bg-brand-gradient {
+    background-image: linear-gradient(135deg, #00b7f1, #0059c7);
+  }
+
+  .bg-sidebar-gradient {
+    background-image: linear-gradient(
+      180deg,
+      var(--sidebar-bg-from) 0%,
+      var(--sidebar-bg-to) 100%
+    );
+  }
+
+  @keyframes navFlash {
+    0%   { background-color: hsl(213 100% 39% / 0.18); }
+    100% { background-color: transparent; }
+  }
+
+  .animate-nav-flash {
+    animation: navFlash 1.1s ease-out;
+  }
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
