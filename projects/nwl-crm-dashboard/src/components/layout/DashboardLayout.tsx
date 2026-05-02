@@ -10,10 +10,14 @@ import { FinancialsTab } from '@/components/financials/FinancialsTab'
 import { PCNPracticesTab } from '@/components/practices/PCNPracticesTab'
 import { GroupRegisterBanner } from '@/components/dashboard/GroupRegisterBanner'
 import { useDashboardStore } from '@/hooks/useDashboardStore'
+import { useIdleTimeout } from '@/hooks/useIdleTimeout'
 import { formatDate } from '@/lib/utils'
 import type { CSVUpload, GroupSplit, ParseResult } from '@/lib/types'
+import { signOutAction } from './actions'
 import { Sidebar, type TabId } from './Sidebar'
 import { TopBar } from './TopBar'
+
+const IDLE_TIMEOUT_MS = 30 * 60 * 1000
 
 interface DashboardLayoutProps {
   practiceName: string
@@ -36,6 +40,8 @@ export function DashboardLayout({
   const [error, setError] = useState<string | null>(null)
   const [pending, setPending] = useState<PendingUpload | null>(null)
   const addUpload = useDashboardStore((s) => s.addUpload)
+
+  useIdleTimeout(IDLE_TIMEOUT_MS, signOutAction)
 
   useEffect(() => {
     const unsub = useDashboardStore.persist.onFinishHydration(() => setHydrated(true))
