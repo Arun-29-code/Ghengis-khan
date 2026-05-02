@@ -1,5 +1,4 @@
 import { create } from 'zustand'
-import { persist, createJSONStorage } from 'zustand/middleware'
 import type {
   CSVUpload,
   DashboardState,
@@ -10,6 +9,7 @@ import { computeKPIResults } from '@/lib/kpi-engine'
 
 interface DashboardStore extends DashboardState {
   addUpload: (upload: CSVUpload) => void
+  hydrate: (yearEnd: CSVUpload | null, today: CSVUpload | null) => void
   clearAll: () => void
   setGroupSplitOverride: (split: GroupSplit) => void
 }
@@ -112,48 +112,58 @@ function routeUpload(
   }
 }
 
-export const useDashboardStore = create<DashboardStore>()(
-  persist(
-    (set, get) => ({
-      ...initialState,
+// Source of truth lives in Vercel Blob (server-side); the store is a derived
+// in-memory cache hydrated on dashboard mount via /api/uploads. No persist
+// middleware — switching browsers must show the same data, which means
+// localStorage was the wrong source of truth.
+export const useDashboardStore = create<DashboardStore>()((set, get) => ({
+  ...initialState,
 
-      addUpload: (upload) => {
-        const state = get()
-        const slots = routeUpload(state, upload)
-        const computed = recompute({
-          yearEndCurrent: slots.yearEndUpload,
-          yearEndPrev: slots.yearEndPrevious,
-          todayCurrent: slots.todayUpload,
-          todayPrev: slots.todayPrevious,
-          groupSplitOverride: state.groupSplitOverride,
-        })
-        set({ ...slots, ...computed })
-      },
+  addUpload: (upload) => {
+    const state = get()
+    const slots = routeUpload(state, upload)
+    const computed = recompute({
+      yearEndCurrent: slots.yearEndUpload,
+      yearEndPrev: slots.yearEndPrevious,
+      todayCurrent: slots.todayUpload,
+      todayPrev: slots.todayPrevious,
+      groupSplitOverride: state.groupSplitOverride,
+    })
+    set({ ...slots, ...computed })
+  },
 
-      clearAll: () => set({ ...initialState }),
+  // Seed both slots from the server in one set() so recompute runs once.
+  // Previous-slot state is intentionally null — server only stores current,
+  // so cross-device delta resets until the next upload populates "previous".
+  hydrate: (yearEnd, today) => {
+    const state = get()
+    const computed = recompute({
+      yearEndCurrent: yearEnd,
+      yearEndPrev: null,
+      todayCurrent: today,
+      todayPrev: null,
+      groupSplitOverride: state.groupSplitOverride,
+    })
+    set({
+      yearEndUpload: yearEnd,
+      yearEndPrevious: null,
+      todayUpload: today,
+      todayPrevious: null,
+      ...computed,
+    })
+  },
 
-      setGroupSplitOverride: (split) => {
-        const state = get()
-        const computed = recompute({
-          yearEndCurrent: state.yearEndUpload,
-          yearEndPrev: state.yearEndPrevious,
-          todayCurrent: state.todayUpload,
-          todayPrev: state.todayPrevious,
-          groupSplitOverride: split,
-        })
-        set({ groupSplitOverride: split, ...computed })
-      },
-    }),
-    {
-      // Bump the store name whenever the persisted shape changes:
-      //   v1 → v2: single-upload → two-slot (year-end + today)
-      //   v2 → v3: CRM08 merged (kpiRows now has CRM08, not CRM08A/B/C; plus
-      //            new crm08Breakdown field on CSVUpload).
-      // This discards any stale state rather than silently rehydrating it into
-      // a shape the engine no longer understands.
-      name: 'nwl-crm-dashboard-v3',
-      storage: createJSONStorage(() => localStorage),
-      skipHydration: true,
-    },
-  ),
-)
+  clearAll: () => set({ ...initialState }),
+
+  setGroupSplitOverride: (split) => {
+    const state = get()
+    const computed = recompute({
+      yearEndCurrent: state.yearEndUpload,
+      yearEndPrev: state.yearEndPrevious,
+      todayCurrent: state.todayUpload,
+      todayPrev: state.todayPrevious,
+      groupSplitOverride: split,
+    })
+    set({ groupSplitOverride: split, ...computed })
+  },
+}))
