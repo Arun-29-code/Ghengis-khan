@@ -36,12 +36,24 @@ export function DashboardLayout({
   const [error, setError] = useState<string | null>(null)
   const [pending, setPending] = useState<PendingUpload | null>(null)
   const addUpload = useDashboardStore((s) => s.addUpload)
+  const hydrate = useDashboardStore((s) => s.hydrate)
 
   useEffect(() => {
-    const unsub = useDashboardStore.persist.onFinishHydration(() => setHydrated(true))
-    void useDashboardStore.persist.rehydrate()
-    return unsub
-  }, [])
+    let cancelled = false
+    fetch('/api/uploads', { cache: 'no-store' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data: { yearEnd: CSVUpload | null; today: CSVUpload | null } | null) => {
+        if (cancelled) return
+        if (data) hydrate(data.yearEnd, data.today)
+        setHydrated(true)
+      })
+      .catch(() => {
+        if (!cancelled) setHydrated(true)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [hydrate])
 
   const yearEndUpload = useDashboardStore((s) => s.yearEndUpload)
   const todayUpload = useDashboardStore((s) => s.todayUpload)
@@ -62,7 +74,7 @@ export function DashboardLayout({
   const dateBadgeLabel = latestUploadIso ? `Uploaded ${formatDate(latestUploadIso)}` : undefined
 
   const finalizeUpload = useCallback(
-    (data: NonNullable<ParseResult['data']>, split: GroupSplit) => {
+    async (data: NonNullable<ParseResult['data']>, split: GroupSplit) => {
       // If Group 1/2 were just entered by hand via the GroupSplitEntry modal,
       // we need to rebuild the aggregated CRM08 and overridden CRM09 denominators
       // now that G1+G2 is finally known. The parser can't do it upfront if the
@@ -96,6 +108,30 @@ export function DashboardLayout({
         groupSplit: split,
         reportType: data.reportType,
       }
+
+      // Pessimistic: server save must succeed before we update the local view,
+      // so "uploaded" means "available on other devices" — that's the bug we
+      // just shipped this whole branch to fix. Modal stays open on failure.
+      try {
+        const res = await fetch('/api/uploads', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(upload),
+        })
+        if (!res.ok) {
+          const text = await res.text().catch(() => '')
+          setError(`Failed to save upload: ${res.status} ${text || res.statusText}`)
+          return
+        }
+      } catch (err) {
+        setError(
+          err instanceof Error
+            ? `Failed to save upload: ${err.message}`
+            : 'Failed to save upload',
+        )
+        return
+      }
+
       addUpload(upload)
       setPending(null)
       setError(null)
