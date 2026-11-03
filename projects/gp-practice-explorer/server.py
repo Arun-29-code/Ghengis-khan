@@ -1117,13 +1117,10 @@ if FRONTEND_DIR.exists():
     routes.append(Mount("/", app=StaticFiles(directory=str(FRONTEND_DIR), html=True), name="frontend"))
 
 base_app = Starlette(routes=routes, lifespan=lambda app: mcp.session_manager.run())
-
 # Apply API key middleware only to /mcp path
 class MCPOnlyAPIKeyMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         if not request.url.path.startswith("/mcp"):
-            return await call_next(request)
-                if not API_KEY:
             return await call_next(request)
         auth_header = request.headers.get("Authorization", "")
         if auth_header.startswith("Bearer ") and auth_header[7:] == API_KEY:
@@ -1136,7 +1133,7 @@ class MCPOnlyAPIKeyMiddleware(BaseHTTPMiddleware):
             status_code=401,
         )
 
-base_app.add_middleware(MCPOnlyAPIKeyMiddleware)
+base_app.add_middleware(MCPOnlyAPIKeyMiddleware))
 
 # ---------------------------------------------------------------------------
 # Entry point
