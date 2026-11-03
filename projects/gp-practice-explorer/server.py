@@ -28,6 +28,7 @@ load_dotenv()
 # Configuration
 # ---------------------------------------------------------------------------
 API_KEY = os.getenv("MCP_API_KEY", "")
+DASHBOARD_PASSWORD = os.getenv("DASHBOARD_PASSWORD", "")
 DATA_DIR = Path(os.getenv("DATA_DIR", "./data"))
 
 # ---------------------------------------------------------------------------
@@ -1011,13 +1012,14 @@ def enrich_gp_partner_from_web(name: str, practice_name: str = "") -> dict:
 # ---------------------------------------------------------------------------
 
 def _check_auth(request: Request) -> bool:
-    """Return True if the request carries a valid API key."""
-    if not API_KEY:
-        return False
+    """Return True if the request carries a valid API key or dashboard password."""
     auth_header = request.headers.get("Authorization", "")
-    if auth_header.startswith("Bearer ") and auth_header[7:] == API_KEY:
+    token = auth_header[7:] if auth_header.startswith("Bearer ") else ""
+    query_key = request.query_params.get("api_key", "")
+
+    if API_KEY and (token == API_KEY or query_key == API_KEY):
         return True
-    if request.query_params.get("api_key", "") == API_KEY:
+    if DASHBOARD_PASSWORD and (token == DASHBOARD_PASSWORD or query_key == DASHBOARD_PASSWORD):
         return True
     return False
 
@@ -1103,10 +1105,10 @@ class AuthMiddleware(BaseHTTPMiddleware):
         if path == "/health":
             return await call_next(request)
 
-        # If MCP_API_KEY is empty, refuse all protected requests
-        if not API_KEY:
+        # If neither key is configured, refuse all protected requests
+        if not API_KEY and not DASHBOARD_PASSWORD:
             return JSONResponse(
-                {"error": "Server misconfigured: MCP_API_KEY is not set."},
+                {"error": "Server misconfigured: no authentication keys are set."},
                 status_code=503,
             )
 
@@ -1114,14 +1116,26 @@ class AuthMiddleware(BaseHTTPMiddleware):
         if path == "/":
             return await call_next(request)
 
-        # Everything else (/api/*, /mcp/*) requires auth
         auth_header = request.headers.get("Authorization", "")
-        if auth_header.startswith("Bearer ") and auth_header[7:] == API_KEY:
+        token = auth_header[7:] if auth_header.startswith("Bearer ") else ""
+        query_key = request.query_params.get("api_key", "")
+
+        # MCP endpoint: only accepts MCP_API_KEY
+        if path.startswith("/mcp"):
+            if API_KEY and (token == API_KEY or query_key == API_KEY):
+                return await call_next(request)
+            return JSONResponse(
+                {"error": "Unauthorised. Provide a valid API key via 'Authorization: Bearer <key>' header."},
+                status_code=401,
+            )
+
+        # API endpoints: accept either MCP_API_KEY or DASHBOARD_PASSWORD
+        if API_KEY and (token == API_KEY or query_key == API_KEY):
             return await call_next(request)
-        if request.query_params.get("api_key", "") == API_KEY:
+        if DASHBOARD_PASSWORD and (token == DASHBOARD_PASSWORD or query_key == DASHBOARD_PASSWORD):
             return await call_next(request)
         return JSONResponse(
-            {"error": "Unauthorised. Provide a valid API key via 'Authorization: Bearer <key>' header."},
+            {"error": "Unauthorised. Provide a valid password via 'Authorization: Bearer <password>' header."},
             status_code=401,
         )
 
