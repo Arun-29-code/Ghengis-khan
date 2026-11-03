@@ -6,8 +6,9 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy server code and data
+# Copy server code, dashboard, and data
 COPY server.py .
+COPY dashboard.html .
 COPY data/ ./data/
 
 # Expose port

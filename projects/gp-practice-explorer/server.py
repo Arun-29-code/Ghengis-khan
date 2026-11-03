@@ -1,7 +1,8 @@
 """
-GP Practice Explorer - MCP Server
+GP Practice Explorer - MCP Server + Dashboard API
 Exposes GP practice sales intelligence data to Claude AI via the
-Model Context Protocol (MCP) over HTTP with API key authentication.
+Model Context Protocol (MCP) over HTTP with API key authentication,
+and serves a web dashboard with JSON API endpoints.
 """
 
 import csv
@@ -17,7 +18,9 @@ from ddgs import DDGS
 from mcp.server.fastmcp import FastMCP
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, HTMLResponse, Response
+from starlette.routing import Route, Mount
+from starlette.applications import Starlette
 
 load_dotenv()
 
@@ -41,7 +44,6 @@ def _load_data() -> dict[str, Any]:
         reader = csv.DictReader(f)
         for row in reader:
             pid = row["PRACTICE_ID"].strip()
-            # Collect GP partners (up to 10)
             partners = []
             for i in range(1, 11):
                 name = row.get(f"GP_PARTNER_{i}", "").strip()
@@ -60,29 +62,22 @@ def _load_data() -> dict[str, Any]:
                 "number_of_patients": int(row["NUMBER_OF_PATIENTS"]) if row["NUMBER_OF_PATIENTS"].strip().isdigit() else 0,
                 "website": row["WEBSITE"].strip() or None,
                 "gp_partners": partners,
-                # enriched later
                 "status": "cold_lead",
                 "lead_score": 1,
                 "is_customer": False,
             }
 
-    # Note: GP_PARTNER_N_LINKEDIN column sometimes contains a LinkedIn URL
-    # (e.g. https://uk.linkedin.com/in/...) and sometimes an additional partner
-    # name that overflowed from the name columns. We normalise this here:
     for pid, practice in practices.items():
         normalised_partners = []
         for partner in practice["gp_partners"]:
             li = partner.get("linkedin")
             if li and not li.lower().startswith("http"):
-                # It's actually another partner name, not a LinkedIn URL
-                # Keep the original partner and add the extra name as a separate
-                # partner record with no contact info (to avoid losing the data)
                 partner["linkedin"] = None
-                partner["linkedin_extra_name"] = li  # preserve for reference
+                partner["linkedin_extra_name"] = li
             normalised_partners.append(partner)
         practice["gp_partners"] = normalised_partners
 
-    # 2. customer_data.json – statuses, customer lists
+    # 2. customer_data.json
     customer_path = DATA_DIR / "customer_data.json"
     with open(customer_path, encoding="utf-8") as f:
         customer_data = json.load(f)
@@ -92,9 +87,7 @@ def _load_data() -> dict[str, Any]:
     customer_icbs: set[str] = set(customer_data.get("customer_icbs", []))
     lead_data: dict[str, dict] = customer_data.get("lead_data", {})
 
-    # Enrich practices with lead status
     for pid, practice in practices.items():
-        # Extract ODS code (e.g. "A81001" from "A81001 - THE DENSHAM SURGERY")
         ods_match = re.match(r"^([A-Z0-9]+)", pid)
         ods_code = ods_match.group(1) if ods_match else None
 
@@ -143,7 +136,6 @@ print(f"Loaded {len(PRACTICES)} practices.")
 # ---------------------------------------------------------------------------
 # Build a global GP partner index for fast name lookups
 # ---------------------------------------------------------------------------
-# GP_PARTNER_INDEX: name_lower -> list of {name, practice_id, email, linkedin, facebook}
 GP_PARTNER_INDEX: dict[str, list[dict]] = {}
 for _pid, _practice in PRACTICES.items():
     for _partner in _practice["gp_partners"]:
@@ -169,7 +161,6 @@ print(f"Indexed {len(GP_PARTNER_INDEX)} unique GP partner names.")
 # ---------------------------------------------------------------------------
 
 def _practice_summary(p: dict) -> dict:
-    """Return a concise summary of a practice record."""
     return {
         "practice_id": p["practice_id"],
         "pcn_name": p["pcn_name"],
@@ -184,7 +175,6 @@ def _practice_summary(p: dict) -> dict:
 
 
 def _practice_full(p: dict) -> dict:
-    """Return the full practice record including GP partner contact details."""
     return {
         "practice_id": p["practice_id"],
         "pcn_name": p["pcn_name"],
@@ -214,7 +204,7 @@ def _size_bucket(n: int) -> str:
 # ---------------------------------------------------------------------------
 mcp = FastMCP(
     "GP Practice Explorer",
-      host="0.0.0.0",
+    host="0.0.0.0",
     instructions=(
         "You are a sales intelligence assistant for GP Automate. "
         "Use these tools to explore UK GP practices, identify leads, "
@@ -261,35 +251,28 @@ def search_practices(
 
     results = []
     for p in PRACTICES.values():
-        # Status filter
         if status != "all":
             if status == "hot_lead":
-                # Hot leads are warm_lead_pcn practices in PCNs with high penetration
                 pcn = PCN_STATS.get(p["pcn_name"], {})
                 if not (p["status"] == "warm_lead_pcn" and pcn.get("penetration", 0) >= 50):
                     continue
             elif p["status"] != status:
                 continue
 
-        # Clinical system filter
         if clinical_system != "all":
             if clinical_system.lower() not in p["clinical_system"].lower():
                 continue
 
-        # Size filter
         if size != "all":
             if _size_bucket(p["number_of_patients"]) != size:
                 continue
 
-        # ICB filter
         if icb_lower and icb_lower not in p["icb_name"].lower():
             continue
 
-        # PCN filter
         if pcn_lower and pcn_lower not in p["pcn_name"].lower():
             continue
 
-        # Free-text query
         if query_lower:
             searchable = (
                 p["practice_id"].lower()
@@ -326,17 +309,14 @@ def get_practice_detail(practice_id: str) -> dict:
     """
     pid = practice_id.strip()
 
-    # Exact match first
     if pid in PRACTICES:
         return _practice_full(PRACTICES[pid])
 
-    # Try ODS code prefix match
     pid_upper = pid.upper()
     for key, p in PRACTICES.items():
         if key.startswith(pid_upper + " ") or key.startswith(pid_upper + "-"):
             return _practice_full(p)
 
-    # Fuzzy name match
     pid_lower = pid.lower()
     matches = [p for key, p in PRACTICES.items() if pid_lower in key.lower()]
     if len(matches) == 1:
@@ -365,7 +345,6 @@ def get_pcn_details(pcn_name: str) -> dict:
     """
     pcn_lower = pcn_name.lower().strip()
 
-    # Find matching PCN names
     matching_pcns = [k for k in PCN_STATS if pcn_lower in k.lower()]
     if not matching_pcns:
         return {"error": f"No PCN found matching '{pcn_name}'."}
@@ -417,7 +396,6 @@ def find_expansion_opportunities(practice_id: str) -> dict:
     """
     pid = practice_id.strip()
 
-    # Resolve practice
     practice = None
     if pid in PRACTICES:
         practice = PRACTICES[pid]
@@ -475,7 +453,6 @@ def get_icb_summary(icb_name: str = "") -> dict:
         ICB summary with customer counts, PCN breakdown, and priority info.
     """
     if not icb_name.strip():
-        # Return all ICBs with summary stats
         icb_stats: dict[str, dict] = {}
         for p in PRACTICES.values():
             icb = p["icb_name"]
@@ -497,7 +474,6 @@ def get_icb_summary(icb_name: str = "") -> dict:
             else:
                 icb_stats[icb]["cold_leads"] += 1
 
-        # Add penetration %
         for icb in icb_stats.values():
             t = icb["total_practices"]
             icb["penetration_pct"] = round(icb["customers"] / t * 100, 1) if t else 0
@@ -508,11 +484,9 @@ def get_icb_summary(icb_name: str = "") -> dict:
             "icbs": sorted_icbs,
         }
 
-    # Drill into a specific ICB
     icb_lower = icb_name.lower().strip()
     matching = [k for k in ICB_PRIORITIES if icb_lower in k.lower()]
     if not matching:
-        # Try from practice data
         matching = list({p["icb_name"] for p in PRACTICES.values() if icb_lower in p["icb_name"].lower()})
 
     if not matching:
@@ -581,7 +555,6 @@ def get_statistics_overview() -> dict:
     ]
     warm_pcns.sort(key=lambda x: -x["penetration_pct"])
 
-    # Top ICBs by customer count
     icb_customer_counts: dict[str, int] = {}
     for p in PRACTICES.values():
         if p["is_customer"]:
@@ -622,7 +595,6 @@ def get_lead_context(practice_id: str) -> dict:
     """
     pid = practice_id.strip()
 
-    # Resolve practice
     practice = None
     if pid in PRACTICES:
         practice = PRACTICES[pid]
@@ -641,13 +613,11 @@ def get_lead_context(practice_id: str) -> dict:
     icb = practice["icb_name"]
     icb_priority = ICB_PRIORITIES.get(icb, {})
 
-    # Find customers in same PCN
     customers_in_pcn = [
         p["practice_id"] for p in PRACTICES.values()
         if p["pcn_name"] == pcn and p["is_customer"]
     ]
 
-    # Determine reason for classification
     status = practice["status"]
     if status == "customer":
         reason = "This practice is an existing customer."
@@ -735,7 +705,6 @@ def list_top_opportunities(
             "icb_performance_pct": icb_priority.get("performance", 0),
         })
 
-    # Sort: highest PCN penetration first, then ICB performance
     candidates.sort(key=lambda x: (-x["pcn_penetration_pct"], -(x.get("icb_performance_pct") or 0)))
 
     return {
@@ -774,14 +743,11 @@ def search_gp_partners(
 
     results = []
     for key, entries in GP_PARTNER_INDEX.items():
-        # Name filter
         if name_lower and name_lower not in key:
             continue
         for entry in entries:
-            # Practice filter
             if pid_lower and pid_lower not in entry["practice_id"].lower():
                 continue
-            # Missing field filter
             if missing_field == "email" and entry.get("email"):
                 continue
             elif missing_field == "linkedin" and entry.get("linkedin"):
@@ -817,12 +783,10 @@ def get_gp_partner_profile(name: str) -> dict:
     """
     name_lower = name.lower().strip()
 
-    # Exact match first
     exact = GP_PARTNER_INDEX.get(name_lower, [])
     if exact:
         matches = exact
     else:
-        # Partial match
         matches = []
         for key, entries in GP_PARTNER_INDEX.items():
             if name_lower in key:
@@ -946,13 +910,11 @@ def enrich_gp_partner_from_web(name: str, practice_name: str = "") -> dict:
     name_stripped = name.strip()
     name_lower = name_stripped.lower()
 
-    # Check what we already have in the dashboard
     existing = []
     for key, entries in GP_PARTNER_INDEX.items():
         if name_lower in key or key in name_lower:
             existing.extend(entries)
 
-    # Build search queries
     base_query = f'{name_stripped} GP doctor UK'
     if practice_name:
         base_query = f'{name_stripped} GP "{practice_name}" UK'
@@ -967,7 +929,6 @@ def enrich_gp_partner_from_web(name: str, practice_name: str = "") -> dict:
 
     try:
         with DDGS() as ddgs:
-            # Search 1: LinkedIn-specific
             li_results = list(ddgs.text(linkedin_query, max_results=5))
             for r in li_results:
                 url = r.get("href", "")
@@ -983,9 +944,8 @@ def enrich_gp_partner_from_web(name: str, practice_name: str = "") -> dict:
                         "snippet": body[:200],
                     })
 
-            time.sleep(0.5)  # polite delay
+            time.sleep(0.5)
 
-            # Search 2: General / NHS
             general_results = list(ddgs.text(nhs_query, max_results=8))
             for r in general_results:
                 url = r.get("href", "")
@@ -1014,7 +974,6 @@ def enrich_gp_partner_from_web(name: str, practice_name: str = "") -> dict:
             "dashboard_data": existing,
         }
 
-    # Deduplicate found_results
     seen_urls = set()
     deduped = []
     for r in found_results + other_links:
@@ -1048,92 +1007,144 @@ def enrich_gp_partner_from_web(name: str, practice_name: str = "") -> dict:
 
 
 # ---------------------------------------------------------------------------
-# API Key authentication middleware
+# JSON API endpoints (reuse tool functions)
 # ---------------------------------------------------------------------------
-class APIKeyMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):
-        # Allow health check without auth
-        if request.url.path in ("/health", "/"):
-            return await call_next(request)
 
-        # Check Authorization header: Bearer <key>
-        auth_header = request.headers.get("Authorization", "")
-        if auth_header.startswith("Bearer "):
-            token = auth_header[len("Bearer "):]
-            if token == API_KEY:
-                return await call_next(request)
+def _check_auth(request: Request) -> bool:
+    """Return True if the request carries a valid API key."""
+    if not API_KEY:
+        return False
+    auth_header = request.headers.get("Authorization", "")
+    if auth_header.startswith("Bearer ") and auth_header[7:] == API_KEY:
+        return True
+    if request.query_params.get("api_key", "") == API_KEY:
+        return True
+    return False
 
-        # Also accept as query param ?api_key=<key> (for easy testing)
-        query_key = request.query_params.get("api_key", "")
-        if query_key == API_KEY:
-            return await call_next(request)
+_UNAUTHORIZED = JSONResponse(
+    {"error": "Unauthorised. Provide a valid API key via 'Authorization: Bearer <key>' header."},
+    status_code=401,
+)
 
-        return JSONResponse(
-            {"error": "Unauthorized. Provide a valid API key via 'Authorization: Bearer <key>' header."},
-            status_code=401,
-        )
+async def api_overview(request: Request):
+    if not _check_auth(request):
+        return _UNAUTHORIZED
+    return JSONResponse(get_statistics_overview())
+
+async def api_icb_summary(request: Request):
+    if not _check_auth(request):
+        return _UNAUTHORIZED
+    icb_name = request.query_params.get("icb_name", "")
+    return JSONResponse(get_icb_summary(icb_name=icb_name))
+
+async def api_pcn_details(request: Request):
+    if not _check_auth(request):
+        return _UNAUTHORIZED
+    pcn_name = request.query_params.get("pcn_name", "")
+    if not pcn_name:
+        return JSONResponse({"error": "pcn_name query parameter is required."}, status_code=400)
+    return JSONResponse(get_pcn_details(pcn_name=pcn_name))
+
+async def api_opportunities(request: Request):
+    if not _check_auth(request):
+        return _UNAUTHORIZED
+    icb_name = request.query_params.get("icb_name", "")
+    clinical_system = request.query_params.get("clinical_system", "all")
+    limit = min(int(request.query_params.get("limit", "50")), 100)
+    return JSONResponse(list_top_opportunities(icb_name=icb_name, clinical_system=clinical_system, limit=limit))
+
+async def api_search(request: Request):
+    if not _check_auth(request):
+        return _UNAUTHORIZED
+    query = request.query_params.get("q", "")
+    status = request.query_params.get("status", "all")
+    clinical_system = request.query_params.get("clinical_system", "all")
+    icb_name = request.query_params.get("icb_name", "")
+    limit = min(int(request.query_params.get("limit", "30")), 100)
+    return JSONResponse(search_practices(query=query, status=status, clinical_system=clinical_system, icb_name=icb_name, limit=limit))
+
+async def api_practice(request: Request):
+    if not _check_auth(request):
+        return _UNAUTHORIZED
+    practice_id = request.path_params["practice_id"]
+    return JSONResponse(get_practice_detail(practice_id=practice_id))
 
 
 # ---------------------------------------------------------------------------
-# Build the final ASGI app: MCP backend + static frontend + health route
+# Dashboard HTML (self-contained, no build step)
 # ---------------------------------------------------------------------------
-from starlette.routing import Route, Mount
-from starlette.responses import JSONResponse as StarletteJSON, FileResponse
-from starlette.staticfiles import StaticFiles
-from starlette.applications import Starlette
+DASHBOARD_HTML_PATH = Path(__file__).parent / "dashboard.html"
 
-FRONTEND_DIR = Path(os.getenv("FRONTEND_DIR", "./frontend"))
+async def serve_dashboard(request: Request):
+    if DASHBOARD_HTML_PATH.exists():
+        return HTMLResponse(DASHBOARD_HTML_PATH.read_text(encoding="utf-8"))
+    return HTMLResponse("<h1>Dashboard not found</h1>", status_code=500)
 
+
+# ---------------------------------------------------------------------------
+# Health endpoint (no auth)
+# ---------------------------------------------------------------------------
 async def health(request: Request):
-    return StarletteJSON({
+    return JSONResponse({
         "status": "ok",
         "service": "GP Practice Explorer MCP",
         "practices_loaded": len(PRACTICES),
     })
 
-async def serve_index(request: Request):
-    """Serve the React SPA for all non-API, non-asset routes."""
-    index_path = FRONTEND_DIR / "index.html"
-    if index_path.exists():
-        return FileResponse(str(index_path))
-    return StarletteJSON({"error": "Frontend not found"}, status_code=404)
 
-# Get the MCP ASGI app
-mcp_app = mcp.streamable_http_app()
-
-# Mount everything together:
-# /health  -> health check (no auth)
-# /mcp     -> MCP protocol (auth required via middleware)
-# /assets  -> static JS/CSS (no auth)
-# /        -> SPA frontend (no auth)
-routes = [
-    Route("/health", health, methods=["GET"]),
-    Mount("/mcp", app=mcp_app),
-]
-
-if FRONTEND_DIR.exists():
-    routes.append(Mount("/assets", app=StaticFiles(directory=str(FRONTEND_DIR / "assets")), name="assets"))
-    # Serve data files at root level for the SPA
-    routes.append(Mount("/", app=StaticFiles(directory=str(FRONTEND_DIR), html=True), name="frontend"))
-
-base_app = Starlette(routes=routes, lifespan=lambda app: mcp.session_manager.run())
-# Apply API key middleware only to /mcp path
-class MCPOnlyAPIKeyMiddleware(BaseHTTPMiddleware):
+# ---------------------------------------------------------------------------
+# Auth middleware: protect everything except /health
+# ---------------------------------------------------------------------------
+class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
-        if not request.url.path.startswith("/mcp"):
+        path = request.url.path
+
+        # /health is always open
+        if path == "/health":
             return await call_next(request)
+
+        # If MCP_API_KEY is empty, refuse all protected requests
+        if not API_KEY:
+            return JSONResponse(
+                {"error": "Server misconfigured: MCP_API_KEY is not set."},
+                status_code=503,
+            )
+
+        # Dashboard at / serves static HTML (no data) — auth is handled client-side
+        if path == "/":
+            return await call_next(request)
+
+        # Everything else (/api/*, /mcp/*) requires auth
         auth_header = request.headers.get("Authorization", "")
         if auth_header.startswith("Bearer ") and auth_header[7:] == API_KEY:
             return await call_next(request)
-        query_key = request.query_params.get("api_key", "")
-        if query_key == API_KEY:
+        if request.query_params.get("api_key", "") == API_KEY:
             return await call_next(request)
         return JSONResponse(
-            {"error": "Unauthorized. Provide a valid API key via 'Authorization: Bearer <key>' header."},
+            {"error": "Unauthorised. Provide a valid API key via 'Authorization: Bearer <key>' header."},
             status_code=401,
         )
 
-base_app.add_middleware(MCPOnlyAPIKeyMiddleware)
+
+# ---------------------------------------------------------------------------
+# Build the final ASGI app
+# ---------------------------------------------------------------------------
+mcp_app = mcp.streamable_http_app()
+
+routes = [
+    Route("/health", health, methods=["GET"]),
+    Route("/api/overview", api_overview, methods=["GET"]),
+    Route("/api/icbs", api_icb_summary, methods=["GET"]),
+    Route("/api/pcns", api_pcn_details, methods=["GET"]),
+    Route("/api/opportunities", api_opportunities, methods=["GET"]),
+    Route("/api/search", api_search, methods=["GET"]),
+    Route("/api/practice/{practice_id:path}", api_practice, methods=["GET"]),
+    Mount("/mcp", app=mcp_app),
+    Route("/", serve_dashboard, methods=["GET"]),
+]
+
+base_app = Starlette(routes=routes, lifespan=lambda app: mcp.session_manager.run())
+base_app.add_middleware(AuthMiddleware)
 
 # ---------------------------------------------------------------------------
 # Entry point
