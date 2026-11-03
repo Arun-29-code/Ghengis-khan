@@ -1133,7 +1133,7 @@ class MCPOnlyAPIKeyMiddleware(BaseHTTPMiddleware):
             status_code=401,
         )
 
-base_app.add_middleware(MCPOnlyAPIKeyMiddleware))
+base_app.add_middleware(MCPOnlyAPIKeyMiddleware)
 
 # ---------------------------------------------------------------------------
 # Entry point
