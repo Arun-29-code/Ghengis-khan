@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GP Practice Explorer</title>
+<style>
+:root{
+  --blue-dark:#0059c7;--blue-light:#00b7f1;--bg:#f0f4f8;--card:#fff;
+  --text:#1a1a2e;--muted:#667;--border:#e2e8f0;--green:#16a34a;--amber:#d97706;
+  --red:#dc2626;--radius:10px;--shadow:0 2px 12px rgba(0,0,0,.06);
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
+a{color:var(--blue-dark);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* Layout */
+.top-bar{background:linear-gradient(135deg,var(--blue-dark),var(--blue-light));color:#fff;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.top-bar h1{margin:0;font-size:18px;font-weight:700;letter-spacing:-.3px}
+.top-bar .right{display:flex;align-items:center;gap:12px}
+.top-bar button{background:rgba(255,255,255,.18);border:none;color:#fff;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px}
+.top-bar button:hover{background:rgba(255,255,255,.28)}
+.container{max-width:1280px;margin:0 auto;padding:20px 16px}
+
+/* Tabs */
+.tabs{display:flex;gap:4px;border-bottom:2px solid var(--border);margin-bottom:20px;overflow-x:auto}
+.tab{padding:10px 18px;cursor:pointer;font-weight:600;font-size:13px;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:color .15s,border-color .15s}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--blue-dark);border-bottom-color:var(--blue-dark)}
+
+/* Cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:24px}
+.card{background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+.card .label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.card .value{font-size:28px;font-weight:700;color:var(--blue-dark)}
+.card .sub{font-size:12px;color:var(--muted);margin-top:2px}
+
+/* Tables */
+.table-wrap{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow-x:auto;margin-bottom:24px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:#f8fafc;text-align:left;padding:10px 14px;font-weight:600;color:var(--muted);text-transform:uppercase;font-size:11px;letter-spacing:.4px;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:hover{background:#f8fafc}
+tr.clickable{cursor:pointer}
+
+/* Badges */
+.badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600}
+.badge-customer{background:#dcfce7;color:var(--green)}
+.badge-warm{background:#fef3c7;color:var(--amber)}
+.badge-cold{background:#e2e8f0;color:#475569}
+.badge-hot{background:#fecaca;color:var(--red)}
+
+/* Filters */
+.filters{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px;align-items:end}
+.filters .field{display:flex;flex-direction:column;gap:3px}
+.filters label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase}
+.filters select,.filters input{padding:7px 12px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;background:#fff;outline:none}
+.filters select:focus,.filters input:focus{border-color:var(--blue-light)}
+.filters input[type="search"]{min-width:220px}
+.btn{padding:7px 16px;border:none;border-radius:7px;background:var(--blue-dark);color:#fff;font-weight:600;font-size:13px;cursor:pointer}
+.btn:hover{opacity:.9}
+
+/* Detail panel */
+.detail-panel{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;margin-bottom:24px}
+.detail-panel h2{margin:0 0 4px;font-size:20px}
+.detail-panel .meta{color:var(--muted);font-size:13px;margin-bottom:16px}
+.detail-panel .meta span{margin-right:16px}
+.partners-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.partner-card{border:1px solid var(--border);border-radius:8px;padding:14px}
+.partner-card .name{font-weight:600;margin-bottom:6px}
+.partner-card .contact{font-size:12px;color:var(--muted)}
+.partner-card .contact a{font-size:12px}
+.back-link{display:inline-block;margin-bottom:16px;font-size:13px;cursor:pointer;color:var(--blue-dark)}
+.back-link:hover{text-decoration:underline}
+
+/* Loading */
+.loading{text-align:center;padding:40px;color:var(--muted)}
+.spinner{display:inline-block;width:24px;height:24px;border:3px solid var(--border);border-top-color:var(--blue-light);border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Responsive */
+@media(max-width:640px){
+  .top-bar{padding:12px 16px}
+  .top-bar h1{font-size:15px}
+  .cards{grid-template-columns:repeat(2,1fr)}
+  .card .value{font-size:22px}
+  .filters{flex-direction:column}
+  .filters input[type="search"]{min-width:0;width:100%}
+}
+</style>
+</head>
+<body>
+
+<!-- Login screen -->
+<div id="login-screen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:200;display:flex;align-items:center;justify-content:center">
+<div style="background:var(--card);border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,.08);padding:40px;max-width:400px;width:90%">
+  <h1 style="margin:0 0 8px;font-size:22px;color:var(--blue-dark)">GP Practice Explorer</h1>
+  <p style="color:var(--muted);font-size:14px;margin:0 0 24px;line-height:1.5">Enter your team key to access the dashboard.</p>
+  <form id="login-form">
+    <label style="display:block;font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px">Team Key</label>
+    <input id="login-key" type="password" placeholder="Paste your key" autocomplete="off" required style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:15px;outline:none">
+    <button type="submit" style="width:100%;margin-top:16px;padding:11px;border:none;border-radius:8px;background:linear-gradient(135deg,var(--blue-dark),var(--blue-light));color:#fff;font-size:15px;font-weight:600;cursor:pointer">Sign In</button>
+    <div id="login-error" style="color:var(--red);font-size:13px;margin-top:10px;display:none">Invalid key. Please try again.</div>
+  </form>
+</div>
+</div>
+
+<!-- Dashboard (hidden until authenticated) -->
+<div id="app" style="display:none">
+<div class="top-bar">
+  <h1>GP Practice Explorer</h1>
+  <div class="right">
+    <span id="practice-count" style="font-size:12px;opacity:.8"></span>
+    <button onclick="signOut()">Sign Out</button>
+  </div>
+</div>
+
+<div class="container">
+  <div class="tabs" id="tabs">
+    <div class="tab active" data-tab="overview">Overview</div>
+    <div class="tab" data-tab="icbs">ICBs</div>
+    <div class="tab" data-tab="pcns">Hot &amp; Warm PCNs</div>
+    <div class="tab" data-tab="opportunities">Opportunities</div>
+    <div class="tab" data-tab="search">Search</div>
+  </div>
+
+  <div id="content">
+    <div class="loading"><div class="spinner"></div><p>Loading dashboard...</p></div>
+  </div>
+</div>
+</div>
+
+<script>
+let KEY = '';
+let H = {};
+
+function setKey(k) {
+  KEY = k;
+  H = {'Authorization': 'Bearer ' + k};
+}
+
+function signOut() {
+  sessionStorage.removeItem('gpa_key');
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('login-key').value = '';
+  document.getElementById('login-error').style.display = 'none';
+}
+
+// Login flow
+document.getElementById('login-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const key = document.getElementById('login-key').value.trim();
+  if (!key) return;
+  try {
+    const r = await fetch('/api/overview', {headers: {'Authorization': 'Bearer ' + key}});
+    if (r.ok) {
+      sessionStorage.setItem('gpa_key', key);
+      setKey(key);
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('app').style.display = 'block';
+      overviewData = await r.json();
+      document.getElementById('practice-count').textContent = fmt(overviewData.total_practices) + ' practices';
+      render();
+    } else {
+      document.getElementById('login-error').style.display = 'block';
+    }
+  } catch {
+    document.getElementById('login-error').style.display = 'block';
+  }
+});
+
+async function api(path) {
+  const r = await fetch(path, {headers: H});
+  if (r.status === 401) { signOut(); return null; }
+  return r.json();
+}
+
+function fmt(n) {
+  if (n == null) return '—';
+  return n.toLocaleString('en-GB');
+}
+
+function badge(status) {
+  const map = {customer:'badge-customer',warm_lead_pcn:'badge-warm',cold_lead:'badge-cold',hot_lead:'badge-hot'};
+  const labels = {customer:'Customer',warm_lead_pcn:'Warm',cold_lead:'Cold',hot_lead:'Hot'};
+  return `<span class="badge ${map[status]||'badge-cold'}">${labels[status]||status}</span>`;
+}
+
+function esc(s) {
+  if (!s) return '';
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+// State
+let currentTab = 'overview';
+let overviewData = null;
+let icbData = null;
+
+// Tabs
+document.getElementById('tabs').addEventListener('click', e => {
+  const t = e.target.closest('.tab');
+  if (!t) return;
+  document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+  t.classList.add('active');
+  currentTab = t.dataset.tab;
+  render();
+});
+
+async function render() {
+  const el = document.getElementById('content');
+  switch (currentTab) {
+    case 'overview': return renderOverview(el);
+    case 'icbs': return renderICBs(el);
+    case 'pcns': return renderPCNs(el);
+    case 'opportunities': return renderOpportunities(el);
+    case 'search': return renderSearch(el);
+  }
+}
+
+// ── Overview ──
+function renderOverview(el) {
+  const d = overviewData;
+  if (!d) { el.innerHTML = '<div class="loading"><div class="spinner"></div></div>'; return; }
+  el.innerHTML = `
+    <div class="cards">
+      <div class="card"><div class="label">Customers</div><div class="value">${fmt(d.customers.count)}</div><div class="sub">${d.customers.pct_of_all_practices}% of all practices</div></div>
+      <div class="card"><div class="label">Warm Leads</div><div class="value">${fmt(d.warm_leads)}</div><div class="sub">In PCNs with customers</div></div>
+      <div class="card"><div class="label">Cold Leads</div><div class="value">${fmt(d.cold_leads)}</div><div class="sub">No PCN presence yet</div></div>
+      <div class="card"><div class="label">Patients Covered</div><div class="value">${fmt(d.customers.patient_coverage)}</div><div class="sub">of ${fmt(d.total_patients_uk)} total</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div>
+        <h3 style="margin:0 0 10px;font-size:15px">Top ICBs by Customers</h3>
+        <div class="table-wrap"><table>
+          <thead><tr><th>ICB</th><th style="text-align:right">Customers</th></tr></thead>
+          <tbody>${d.top_icbs_by_customers.map(i=>`<tr><td>${esc(i.icb)}</td><td style="text-align:right">${i.customers}</td></tr>`).join('')}</tbody>
+        </table></div>
+      </div>
+      <div>
+        <h3 style="margin:0 0 10px;font-size:15px">Hot PCNs (50%+ penetration)</h3>
+        <div class="table-wrap"><table>
+          <thead><tr><th>PCN</th><th style="text-align:right">Penetration</th><th style="text-align:right">Customers</th></tr></thead>
+          <tbody>${d.hot_pcns.map(p=>`<tr class="clickable" onclick="showPCN('${esc(p.pcn_name)}')"><td>${esc(p.pcn_name)}</td><td style="text-align:right">${p.penetration_pct}%</td><td style="text-align:right">${p.customers}/${p.total}</td></tr>`).join('')}</tbody>
+        </table></div>
+      </div>
+    </div>
+  `;
+}
+
+// ── ICBs ──
+async function renderICBs(el) {
+  if (!icbData) {
+    el.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+    icbData = await api('/api/icbs');
+    if (!icbData) return;
+  }
+  const icbs = icbData.icbs || [];
+  el.innerHTML = `
+    <h3 style="margin:0 0 12px;font-size:15px">${icbs.length} Integrated Care Boards</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>ICB</th><th>Priority</th><th style="text-align:right">Practices</th><th style="text-align:right">Customers</th><th style="text-align:right">Warm</th><th style="text-align:right">Cold</th><th style="text-align:right">Penetration</th></tr></thead>
+      <tbody>${icbs.map(i=>`<tr>
+        <td>${esc(i.icb_name)}</td>
+        <td>${esc(i.priority)}</td>
+        <td style="text-align:right">${i.total_practices}</td>
+        <td style="text-align:right">${i.customers}</td>
+        <td style="text-align:right">${i.warm_leads}</td>
+        <td style="text-align:right">${i.cold_leads}</td>
+        <td style="text-align:right">${i.penetration_pct}%</td>
+      </tr>`).join('')}</tbody>
+    </table></div>
+  `;
+}
+
+// ── Hot & Warm PCNs ──
+function renderPCNs(el) {
+  const d = overviewData;
+  if (!d) return;
+  el.innerHTML = `
+    <h3 style="margin:0 0 12px;font-size:15px">Hot PCNs (50%+ penetration)</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>PCN</th><th style="text-align:right">Penetration</th><th style="text-align:right">Customers</th><th style="text-align:right">Total</th></tr></thead>
+      <tbody>${d.hot_pcns.map(p=>`<tr class="clickable" onclick="showPCN('${esc(p.pcn_name)}')"><td>${esc(p.pcn_name)}</td><td style="text-align:right">${p.penetration_pct}%</td><td style="text-align:right">${p.customers}</td><td style="text-align:right">${p.total}</td></tr>`).join('')}</tbody>
+    </table></div>
+    <h3 style="margin:16px 0 12px;font-size:15px">Warm PCNs</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>PCN</th><th style="text-align:right">Penetration</th><th style="text-align:right">Customers</th><th style="text-align:right">Total</th></tr></thead>
+      <tbody>${d.warm_pcns.map(p=>`<tr class="clickable" onclick="showPCN('${esc(p.pcn_name)}')"><td>${esc(p.pcn_name)}</td><td style="text-align:right">${p.penetration_pct}%</td><td style="text-align:right">${p.customers}</td><td style="text-align:right">${p.total}</td></tr>`).join('')}</tbody>
+    </table></div>
+  `;
+}
+
+// ── PCN drill-down ──
+async function showPCN(name) {
+  const el = document.getElementById('content');
+  el.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+  const d = await api('/api/pcns?pcn_name=' + encodeURIComponent(name));
+  if (!d) return;
+  const pcn = d.pcns ? d.pcns[0] : d;
+  el.innerHTML = `
+    <span class="back-link" onclick="render()">&#8592; Back</span>
+    <div class="detail-panel">
+      <h2>${esc(pcn.pcn_name)}</h2>
+      <div class="meta">
+        <span>${esc(pcn.icb_name)}</span>
+        <span>${pcn.penetration_pct}% penetration</span>
+        <span>${pcn.customers}/${pcn.total_practices} customers</span>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Practice</th><th>System</th><th style="text-align:right">Patients</th><th>Status</th></tr></thead>
+        <tbody>${(pcn.practices||[]).map(p=>`<tr class="clickable" onclick="showPractice('${esc(p.practice_id)}')">
+          <td>${esc(p.practice_id)}</td>
+          <td>${esc(p.clinical_system)}</td>
+          <td style="text-align:right">${fmt(p.number_of_patients)}</td>
+          <td>${badge(p.status)}</td>
+        </tr>`).join('')}</tbody>
+      </table></div>
+    </div>
+  `;
+}
+
+// ── Opportunities ──
+let oppICB = '', oppSystem = 'all';
+async function renderOpportunities(el) {
+  el.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+  const icbs = icbData ? icbData.icbs : (await api('/api/icbs'))?.icbs || [];
+  if (!icbData && icbs.length) icbData = {icbs};
+  const d = await api(`/api/opportunities?icb_name=${encodeURIComponent(oppICB)}&clinical_system=${encodeURIComponent(oppSystem)}&limit=50`);
+  if (!d) return;
+  el.innerHTML = `
+    <div class="filters">
+      <div class="field">
+        <label>ICB</label>
+        <select id="opp-icb" onchange="oppICB=this.value;renderOpportunities(document.getElementById('content'))">
+          <option value="">All ICBs</option>
+          ${icbs.map(i=>`<option value="${esc(i.icb_name)}" ${i.icb_name===oppICB?'selected':''}>${esc(i.icb_name)}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field">
+        <label>Clinical System</label>
+        <select id="opp-sys" onchange="oppSystem=this.value;renderOpportunities(document.getElementById('content'))">
+          <option value="all" ${oppSystem==='all'?'selected':''}>All</option>
+          <option value="EMIS Web" ${oppSystem==='EMIS Web'?'selected':''}>EMIS Web</option>
+          <option value="SystmOne" ${oppSystem==='SystmOne'?'selected':''}>SystmOne</option>
+        </select>
+      </div>
+    </div>
+    <p style="color:var(--muted);font-size:13px;margin:0 0 12px">${fmt(d.total_opportunities)} warm leads ranked by PCN penetration (showing ${d.showing})</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Practice</th><th>PCN</th><th>ICB</th><th>System</th><th style="text-align:right">Patients</th><th style="text-align:right">PCN Penetration</th></tr></thead>
+      <tbody>${d.opportunities.map(o=>`<tr class="clickable" onclick="showPractice('${esc(o.practice_id)}')">
+        <td>${esc(o.practice_id)}</td>
+        <td>${esc(o.pcn_name)}</td>
+        <td style="font-size:12px">${esc(o.icb_name)}</td>
+        <td>${esc(o.clinical_system)}</td>
+        <td style="text-align:right">${fmt(o.number_of_patients)}</td>
+        <td style="text-align:right">${o.pcn_penetration_pct}%</td>
+      </tr>`).join('')}</tbody>
+    </table></div>
+  `;
+}
+
+// ── Search ──
+let searchQuery = '', searchStatus = 'all', searchSystem = 'all';
+function renderSearch(el) {
+  el.innerHTML = `
+    <div class="filters">
+      <div class="field">
+        <label>Search</label>
+        <input type="search" id="sq" placeholder="Practice name, ODS code, or GP name" value="${esc(searchQuery)}" onkeydown="if(event.key==='Enter'){searchQuery=this.value;doSearch()}">
+      </div>
+      <div class="field">
+        <label>Status</label>
+        <select id="ss" onchange="searchStatus=this.value">
+          <option value="all">All</option>
+          <option value="customer" ${searchStatus==='customer'?'selected':''}>Customer</option>
+          <option value="warm_lead_pcn" ${searchStatus==='warm_lead_pcn'?'selected':''}>Warm Lead</option>
+          <option value="cold_lead" ${searchStatus==='cold_lead'?'selected':''}>Cold Lead</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>System</label>
+        <select id="ssys" onchange="searchSystem=this.value">
+          <option value="all">All</option>
+          <option value="EMIS Web" ${searchSystem==='EMIS Web'?'selected':''}>EMIS Web</option>
+          <option value="SystmOne" ${searchSystem==='SystmOne'?'selected':''}>SystmOne</option>
+        </select>
+      </div>
+      <button class="btn" onclick="searchQuery=document.getElementById('sq').value;doSearch()">Search</button>
+    </div>
+    <div id="search-results"></div>
+  `;
+}
+
+async function doSearch() {
+  const el = document.getElementById('search-results');
+  if (!el) return;
+  el.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+  const d = await api(`/api/search?q=${encodeURIComponent(searchQuery)}&status=${searchStatus}&clinical_system=${searchSystem}&limit=50`);
+  if (!d) return;
+  if (!d.practices || d.practices.length === 0) {
+    el.innerHTML = '<p style="color:var(--muted);padding:20px">No practices found.</p>';
+    return;
+  }
+  el.innerHTML = `
+    <p style="color:var(--muted);font-size:13px;margin:0 0 12px">${fmt(d.total_matched)} matched (showing ${d.showing})</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Practice</th><th>PCN</th><th>System</th><th style="text-align:right">Patients</th><th>Status</th><th>GPs</th></tr></thead>
+      <tbody>${d.practices.map(p=>`<tr class="clickable" onclick="showPractice('${esc(p.practice_id)}')">
+        <td>${esc(p.practice_id)}</td>
+        <td>${esc(p.pcn_name)}</td>
+        <td>${esc(p.clinical_system)}</td>
+        <td style="text-align:right">${fmt(p.number_of_patients)}</td>
+        <td>${badge(p.status)}</td>
+        <td style="font-size:12px">${(p.gp_partners||[]).slice(0,3).map(esc).join(', ')}${p.gp_partners.length>3?' ...':''}</td>
+      </tr>`).join('')}</tbody>
+    </table></div>
+  `;
+}
+
+// ── Practice detail ──
+async function showPractice(id) {
+  const el = document.getElementById('content');
+  el.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+  const d = await api('/api/practice/' + encodeURIComponent(id));
+  if (!d) return;
+  if (d.error) { el.innerHTML = `<span class="back-link" onclick="render()">&#8592; Back</span><p>${esc(d.error)}</p>`; return; }
+  el.innerHTML = `
+    <span class="back-link" onclick="render()">&#8592; Back</span>
+    <div class="detail-panel">
+      <h2>${esc(d.practice_id)}</h2>
+      <div class="meta">
+        <span>${badge(d.status)}</span>
+        <span>${esc(d.pcn_name)}</span>
+        <span>${esc(d.icb_name)}</span>
+        <span>${esc(d.clinical_system)}</span>
+        <span>${fmt(d.number_of_patients)} patients</span>
+        ${d.website ? `<span><a href="${esc(d.website)}" target="_blank" rel="noopener">Website</a></span>` : ''}
+      </div>
+      <h3 style="font-size:14px;margin:20px 0 10px">GP Partners (${(d.gp_partners||[]).length})</h3>
+      ${(d.gp_partners||[]).length === 0 ? '<p style="color:var(--muted)">No GP partners recorded.</p>' : `
+      <div class="partners-grid">
+        ${d.gp_partners.map(gp => `
+          <div class="partner-card">
+            <div class="name">${esc(gp.name)}</div>
+            <div class="contact">
+              ${gp.email ? `<div>Email: <a href="mailto:${esc(gp.email)}">${esc(gp.email)}</a></div>` : '<div style="color:#aaa">No email</div>'}
+              ${gp.linkedin ? `<div>LinkedIn: <a href="${esc(gp.linkedin)}" target="_blank" rel="noopener">Profile</a></div>` : '<div style="color:#aaa">No LinkedIn</div>'}
+              ${gp.facebook ? `<div>Facebook: <a href="${esc(gp.facebook)}" target="_blank" rel="noopener">Profile</a></div>` : ''}
+            </div>
+          </div>
+        `).join('')}
+      </div>`}
+    </div>
+  `;
+}
+
+// Boot — check for saved key
+(async () => {
+  const saved = sessionStorage.getItem('gpa_key');
+  if (saved) {
+    setKey(saved);
+    const r = await fetch('/api/overview', {headers: H});
+    if (r.ok) {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('app').style.display = 'block';
+      overviewData = await r.json();
+      document.getElementById('practice-count').textContent = fmt(overviewData.total_practices) + ' practices';
+      render();
+      return;
+    }
+    sessionStorage.removeItem('gpa_key');
+  }
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+})();
+</script>
+</body>
+</html>
