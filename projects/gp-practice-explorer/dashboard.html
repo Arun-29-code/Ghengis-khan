@@ -48,9 +48,19 @@ tr.clickable{cursor:pointer}
 /* Badges */
 .badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600}
 .badge-customer{background:#dcfce7;color:var(--green)}
-.badge-warm{background:#fef3c7;color:var(--amber)}
+.badge-pilot_live{background:#dbeafe;color:#1d4ed8}
+.badge-free_trial_live{background:#ccfbf1;color:#0d9488}
+.badge-onboarding{background:#fef3c7;color:var(--amber)}
+.badge-churned{background:#fecaca;color:var(--red)}
+.badge-churn_notification{background:#fed7aa;color:#c2410c}
+.badge-warm{background:#fef9c3;color:#a16207}
 .badge-cold{background:#e2e8f0;color:#475569}
 .badge-hot{background:#fecaca;color:var(--red)}
+.badge-lost{background:#e2e8f0;color:#64748b}
+
+/* Clickable cards */
+.card.clickable{cursor:pointer;transition:box-shadow .15s,transform .15s}
+.card.clickable:hover{box-shadow:0 4px 20px rgba(0,0,0,.12);transform:translateY(-1px)}
 
 /* Filters */
 .filters{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px;align-items:end}
@@ -184,8 +194,16 @@ function fmt(n) {
 }
 
 function badge(status) {
-  const map = {customer:'badge-customer',warm_lead_pcn:'badge-warm',cold_lead:'badge-cold',hot_lead:'badge-hot'};
-  const labels = {customer:'Customer',warm_lead_pcn:'Warm',cold_lead:'Cold',hot_lead:'Hot'};
+  const map = {
+    customer:'badge-customer',pilot_live:'badge-pilot_live',free_trial_live:'badge-free_trial_live',
+    onboarding:'badge-onboarding',churned:'badge-churned',churn_notification:'badge-churn_notification',
+    warm_lead:'badge-warm',warm_lead_pcn:'badge-warm',cold_lead:'badge-cold',hot_lead:'badge-hot',lost:'badge-lost'
+  };
+  const labels = {
+    customer:'Customer',pilot_live:'Pilot Live',free_trial_live:'Free Trial',
+    onboarding:'Onboarding',churned:'Churned',churn_notification:'Churn Notice',
+    warm_lead:'Warm',warm_lead_pcn:'Warm',cold_lead:'No Contact',hot_lead:'Hot Lead',lost:'Lost'
+  };
   return `<span class="badge ${map[status]||'badge-cold'}">${labels[status]||status}</span>`;
 }
 
@@ -228,17 +246,23 @@ function renderOverview(el) {
   if (!d) { el.innerHTML = '<div class="loading"><div class="spinner"></div></div>'; return; }
   el.innerHTML = `
     <div class="cards">
-      <div class="card"><div class="label">Customers</div><div class="value">${fmt(d.customers.count)}</div><div class="sub">${d.customers.pct_of_all_practices}% of all practices</div></div>
-      <div class="card"><div class="label">Warm Leads</div><div class="value">${fmt(d.warm_leads)}</div><div class="sub">In PCNs with customers</div></div>
-      <div class="card"><div class="label">Cold Leads</div><div class="value">${fmt(d.cold_leads)}</div><div class="sub">No PCN presence yet</div></div>
+      <div class="card clickable" onclick="showStatusDrilldown('customer','Customers')"><div class="label">Customers</div><div class="value">${fmt(d.customers.count)}</div><div class="sub">${d.customers.pct_of_all_practices}% of all practices</div></div>
+      <div class="card clickable" onclick="showStatusDrilldown('warm','Warm Leads')"><div class="label">Warm Leads</div><div class="value">${fmt(d.warm_leads)}</div><div class="sub">In PCNs with customers</div></div>
+      <div class="card clickable" onclick="showStatusDrilldown('cold_lead','Cold Leads')"><div class="label">Cold Leads</div><div class="value">${fmt(d.cold_leads)}</div><div class="sub">No contact yet</div></div>
       <div class="card"><div class="label">Patients Covered</div><div class="value">${fmt(d.customers.patient_coverage)}</div><div class="sub">of ${fmt(d.total_patients_uk)} total</div></div>
+    </div>
+    <div class="cards">
+      <div class="card clickable" onclick="showStatusDrilldown('pilot_live','Pilot Live')"><div class="label">Pilot Live</div><div class="value" style="color:#1d4ed8">${fmt(d.pilot_live)}</div><div class="sub">Live practices</div></div>
+      <div class="card clickable" onclick="showStatusDrilldown('free_trial_live','Free Trial Live')"><div class="label">Free Trial</div><div class="value" style="color:#0d9488">${fmt(d.free_trial_live)}</div><div class="sub">Active trials</div></div>
+      <div class="card clickable" onclick="showStatusDrilldown('onboarding','Onboarding')"><div class="label">Onboarding</div><div class="value" style="color:var(--amber)">${fmt(d.onboarding)}</div><div class="sub">Setting up</div></div>
+      <div class="card clickable" onclick="showStatusDrilldown('churned','Churned')"><div class="label">Churned</div><div class="value" style="color:var(--red)">${fmt(d.churned)}</div><div class="sub">Former customers</div></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
       <div>
         <h3 style="margin:0 0 10px;font-size:15px">Top ICBs by Customers</h3>
         <div class="table-wrap"><table>
           <thead><tr><th>ICB</th><th style="text-align:right">Customers</th></tr></thead>
-          <tbody>${d.top_icbs_by_customers.map(i=>`<tr><td>${esc(i.icb)}</td><td style="text-align:right">${i.customers}</td></tr>`).join('')}</tbody>
+          <tbody>${d.top_icbs_by_customers.map(i=>`<tr class="clickable" onclick="showICB('${esc(i.icb)}')"><td>${esc(i.icb)}</td><td style="text-align:right">${i.customers}</td></tr>`).join('')}</tbody>
         </table></div>
       </div>
       <div>
@@ -264,7 +288,7 @@ async function renderICBs(el) {
     <h3 style="margin:0 0 12px;font-size:15px">${icbs.length} Integrated Care Boards</h3>
     <div class="table-wrap"><table>
       <thead><tr><th>ICB</th><th>Priority</th><th style="text-align:right">Practices</th><th style="text-align:right">Customers</th><th style="text-align:right">Warm</th><th style="text-align:right">Cold</th><th style="text-align:right">Penetration</th></tr></thead>
-      <tbody>${icbs.map(i=>`<tr>
+      <tbody>${icbs.map(i=>`<tr class="clickable" onclick="showICB('${esc(i.icb_name)}')">
         <td>${esc(i.icb_name)}</td>
         <td>${esc(i.priority)}</td>
         <td style="text-align:right">${i.total_practices}</td>
@@ -379,8 +403,12 @@ function renderSearch(el) {
         <select id="ss" onchange="searchStatus=this.value">
           <option value="all">All</option>
           <option value="customer" ${searchStatus==='customer'?'selected':''}>Customer</option>
-          <option value="warm_lead_pcn" ${searchStatus==='warm_lead_pcn'?'selected':''}>Warm Lead</option>
-          <option value="cold_lead" ${searchStatus==='cold_lead'?'selected':''}>Cold Lead</option>
+          <option value="pilot_live" ${searchStatus==='pilot_live'?'selected':''}>Pilot Live</option>
+          <option value="free_trial_live" ${searchStatus==='free_trial_live'?'selected':''}>Free Trial</option>
+          <option value="onboarding" ${searchStatus==='onboarding'?'selected':''}>Onboarding</option>
+          <option value="warm" ${searchStatus==='warm'?'selected':''}>Warm Lead</option>
+          <option value="cold_lead" ${searchStatus==='cold_lead'?'selected':''}>No Contact</option>
+          <option value="churned" ${searchStatus==='churned'?'selected':''}>Churned</option>
         </select>
       </div>
       <div class="field">
@@ -420,6 +448,110 @@ async function doSearch() {
         <td style="font-size:12px">${(p.gp_partners||[]).slice(0,3).map(esc).join(', ')}${p.gp_partners.length>3?' ...':''}</td>
       </tr>`).join('')}</tbody>
     </table></div>
+  `;
+}
+
+// ── Status drill-down (from overview cards) ──
+async function showStatusDrilldown(status, title) {
+  const el = document.getElementById('content');
+  el.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+  const d = await api(`/api/search?status=${encodeURIComponent(status)}&limit=100`);
+  if (!d) return;
+  const practices = d.practices || [];
+  el.innerHTML = `
+    <span class="back-link" onclick="render()">&#8592; Back to Overview</span>
+    <div class="detail-panel">
+      <h2>${esc(title)}</h2>
+      <div class="meta"><span>${fmt(d.total_matched)} practices</span></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Practice</th><th>ICB</th><th style="text-align:right">List Size</th><th>Status</th></tr></thead>
+        <tbody>${practices.map(p=>`<tr class="clickable" onclick="showPractice('${esc(p.practice_id)}')">
+          <td>${esc(p.practice_id)}</td>
+          <td style="font-size:12px">${esc(p.icb_name)}</td>
+          <td style="text-align:right">${fmt(p.number_of_patients)}</td>
+          <td>${badge(p.status)}</td>
+        </tr>`).join('')}</tbody>
+      </table></div>
+      ${d.total_matched > 100 ? `<p style="color:var(--muted);font-size:12px">Showing first 100 of ${fmt(d.total_matched)}</p>` : ''}
+    </div>
+  `;
+}
+
+// ── ICB drill-down ──
+let lastICBName = '';
+async function showICB(name) {
+  const el = document.getElementById('content');
+  el.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+  lastICBName = name;
+  const d = await api('/api/icbs?icb_name=' + encodeURIComponent(name));
+  if (!d) return;
+  el.innerHTML = `
+    <span class="back-link" onclick="render()">&#8592; Back</span>
+    <div class="detail-panel">
+      <h2>${esc(d.icb_name)}</h2>
+      <div class="meta">
+        <span>${esc(d.priority_category)} priority</span>
+        <span>${d.penetration_pct}% penetration</span>
+        <span>${d.customers} customers</span>
+        <span>${d.total_practices} total practices</span>
+      </div>
+      <div class="cards" style="margin-bottom:20px">
+        <div class="card"><div class="label">Customers</div><div class="value">${d.customers}</div></div>
+        <div class="card"><div class="label">Contacted</div><div class="value" style="color:#0d9488">${d.contacted}</div></div>
+        <div class="card"><div class="label">No Contact</div><div class="value" style="color:#475569">${d.no_contact}</div></div>
+        <div class="card"><div class="label">Total</div><div class="value">${d.total_practices}</div></div>
+      </div>
+      <h3 style="font-size:14px;margin:0 0 10px">PCN Breakdown</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>PCN</th><th style="text-align:right">Total</th><th style="text-align:right">Customers</th><th style="text-align:right">Contacted</th><th style="text-align:right">No Contact</th></tr></thead>
+        <tbody>${(d.pcn_breakdown||[]).map(p=>`<tr class="clickable" onclick="showPCNInICB('${esc(p.pcn_name)}','${esc(d.icb_name)}')">
+          <td>${esc(p.pcn_name)}</td>
+          <td style="text-align:right">${p.total}</td>
+          <td style="text-align:right">${p.customers}</td>
+          <td style="text-align:right">${p.contacted}</td>
+          <td style="text-align:right">${p.no_contact}</td>
+        </tr>`).join('')}</tbody>
+      </table></div>
+      <h3 style="font-size:14px;margin:20px 0 10px">All Practices (${d.total_practices})</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Practice</th><th>PCN</th><th style="text-align:right">List Size</th><th>Status</th></tr></thead>
+        <tbody>${(d.practices||[]).map(p=>`<tr class="clickable" onclick="showPractice('${esc(p.practice_id)}')">
+          <td>${esc(p.practice_id)}</td>
+          <td style="font-size:12px">${esc(p.pcn_name)}</td>
+          <td style="text-align:right">${fmt(p.number_of_patients)}</td>
+          <td>${badge(p.status)}</td>
+        </tr>`).join('')}</tbody>
+      </table></div>
+    </div>
+  `;
+}
+
+// ── PCN drill-down within ICB ──
+async function showPCNInICB(pcnName, icbName) {
+  const el = document.getElementById('content');
+  el.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+  const d = await api('/api/pcns?pcn_name=' + encodeURIComponent(pcnName));
+  if (!d) return;
+  const pcn = d.pcns ? d.pcns[0] : d;
+  el.innerHTML = `
+    <span class="back-link" onclick="showICB('${esc(icbName)}')">&#8592; Back to ${esc(icbName)}</span>
+    <div class="detail-panel">
+      <h2>${esc(pcn.pcn_name)}</h2>
+      <div class="meta">
+        <span>${esc(pcn.icb_name)}</span>
+        <span>${pcn.penetration_pct}% penetration</span>
+        <span>${pcn.customers}/${pcn.total_practices} customers</span>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Practice</th><th>System</th><th style="text-align:right">List Size</th><th>Status</th></tr></thead>
+        <tbody>${(pcn.practices||[]).map(p=>`<tr class="clickable" onclick="showPractice('${esc(p.practice_id)}')">
+          <td>${esc(p.practice_id)}</td>
+          <td>${esc(p.clinical_system)}</td>
+          <td style="text-align:right">${fmt(p.number_of_patients)}</td>
+          <td>${badge(p.status)}</td>
+        </tr>`).join('')}</tbody>
+      </table></div>
+    </div>
   `;
 }
 

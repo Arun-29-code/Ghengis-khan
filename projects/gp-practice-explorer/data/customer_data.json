@@ -570,8 +570,8 @@
       "lead_score": 1
     },
     "A82010 - ABBEY ROAD SURGERY": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "free_trial_live",
+      "lead_score": 8
     },
     "A82012 - BRAMPTON MEDICAL PRACTICE": {
       "status": "cold_lead",
@@ -4678,8 +4678,8 @@
       "lead_score": 1
     },
     "C84008 - TUXFORD MEDICAL CENTRE": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "C84009 - BARNBY GATE SURGERY": {
       "status": "cold_lead",
@@ -4690,12 +4690,12 @@
       "lead_score": 1
     },
     "C84011 - ELMSWOOD SURGERY": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "onboarding",
+      "lead_score": 7
     },
     "C84012 - WILLOWBROOK MEDICAL PRACTICE": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "C84013 - KINGFISHER FAMILY PRACTICE": {
       "status": "warm_lead",
@@ -4734,8 +4734,8 @@
       "lead_score": 1
     },
     "C84024 - NEWGATE MEDICAL GROUP": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "C84025 - EAST BRIDGFORD MED CENTRE": {
       "status": "cold_lead",
@@ -4786,8 +4786,8 @@
       "lead_score": 1
     },
     "C84039 - DERBY ROAD HEALTH CENTRE": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "C84042 - SAXON CROSS SURGERY": {
       "status": "cold_lead",
@@ -4966,8 +4966,8 @@
       "lead_score": 1
     },
     "C84116 - MELBOURNE PARK MEDICAL CENTRE": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "onboarding",
+      "lead_score": 7
     },
     "C84117 - RADFORD MEDICAL PRACTICE (KAUR)": {
       "status": "customer",
@@ -5134,8 +5134,8 @@
       "lead_score": 1
     },
     "C84714 - SUNRISE MEDICAL PRACTICE": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "C84720 - NOTSPAR": {
       "status": "warm_lead_pcn",
@@ -7902,8 +7902,8 @@
       "lead_score": 1
     },
     "E85019 - CROWN STREET SURGERY": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "E85020 - BROOK GREEN MEDICAL CENTRE": {
       "status": "cold_lead",
@@ -9710,8 +9710,8 @@
       "lead_score": 1
     },
     "F82033 - DR VM PATEL": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "onboarding",
+      "lead_score": 7
     },
     "F82034 - VICTORIA & FIVE ELMS MEDICAL CENTRE": {
       "status": "cold_lead",
@@ -10278,8 +10278,8 @@
       "lead_score": 1
     },
     "F84081 - THE SPITALFIELDS PRACTICE": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "free_trial_live",
+      "lead_score": 8
     },
     "F84083 - BETHNAL GREEN HEALTH CTR.": {
       "status": "warm_lead",
@@ -10718,16 +10718,16 @@
       "lead_score": 3
     },
     "F85669 - WEST GREEN SURGERY": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "onboarding",
+      "lead_score": 7
     },
     "F85675 - THE ALEXANDRA SURGERY": {
       "status": "warm_lead",
       "lead_score": 3
     },
     "F85676 - BOUNDARY HOUSE SURGERY": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "F85678 - THE TOWN SURGERY LTD": {
       "status": "warm_lead",
@@ -11718,8 +11718,8 @@
       "lead_score": 1
     },
     "G82122 - SWANSCOMBE HEALTH CENTRE": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "onboarding",
+      "lead_score": 7
     },
     "G82125 - OTFORD MEDICAL PRACTICE": {
       "status": "cold_lead",
@@ -11998,8 +11998,8 @@
       "lead_score": 1
     },
     "G82697 - THE CHURCHILL CLINIC": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "onboarding",
+      "lead_score": 7
     },
     "G82698 - THE MEDIC CARE SURGERY": {
       "status": "cold_lead",
@@ -12106,8 +12106,8 @@
       "lead_score": 1
     },
     "G83001 - MANOR BROOK PMS": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "G83002 - THE WESTWOOD SURGERY": {
       "status": "cold_lead",
@@ -12134,8 +12134,8 @@
       "lead_score": 3
     },
     "G83013 - BLACKHEATH STANDARD PMS": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "G83015 - ELTHAM PALACE PMS": {
       "status": "churned",
@@ -12154,8 +12154,8 @@
       "lead_score": 3
     },
     "G83021 - VANBRUGH GROUP PRACTICE": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "G83024 - INGLETON AVENUE SURGERY": {
       "status": "warm_lead_pcn",
@@ -12230,8 +12230,8 @@
       "lead_score": 1
     },
     "G83060 - GLYNDON PMS": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "G83062 - SLADE GREEN MEDICAL CTR.": {
       "status": "warm_lead_pcn",
@@ -12262,8 +12262,8 @@
       "lead_score": 1
     },
     "G83633 - CONWAY PMS": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "G83635 - WAVERLEY PMS": {
       "status": "cold_lead",
@@ -12302,7 +12302,7 @@
       "lead_score": 1
     },
     "G84002 - DYSART SURGERY": {
-      "status": "churned",
+      "status": "churn_notification",
       "lead_score": 1
     },
     "G84003 - LINKS MEDICAL PRACTICE": {
@@ -12338,8 +12338,8 @@
       "lead_score": 3
     },
     "G84011 - EDEN PARK SURGERY": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "G84013 - ST MARY CRAY PRACTICE": {
       "status": "cold_lead",
@@ -12386,8 +12386,8 @@
       "lead_score": 1
     },
     "G84028 - ST JAMES' PRACTICE": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "G84029 - ROBIN HOOD SURGERY": {
       "status": "cold_lead",
@@ -12474,8 +12474,8 @@
       "lead_score": 5
     },
     "G85011 - CLAPHAM FAMILY PRACTICE": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "G85013 - CAMBERWELL GREEN SURGERY": {
       "status": "warm_lead_pcn",
@@ -12566,8 +12566,8 @@
       "lead_score": 3
     },
     "G85041 - PALACE ROAD SURGERY": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "G85042 - ST GILES SURGERY": {
       "status": "warm_lead_pcn",
@@ -12662,8 +12662,8 @@
       "lead_score": 1
     },
     "G85105 - VESTA ROAD SURGERY": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "G85109 - CLAPHAM PARK GROUP PRACTICE": {
       "status": "cold_lead",
@@ -12714,12 +12714,12 @@
       "lead_score": 3
     },
     "G85135 - MINET GREEN HEALTH PRACTICE": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "G85136 - WATERLOO HEALTH CENTRE": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "G85137 - BROCKWELL PARK SURGERY": {
       "status": "cold_lead",
@@ -12742,8 +12742,8 @@
       "lead_score": 1
     },
     "G85642 - BLACKFRIARS MEDICAL PRACTICE": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "G85644 - THE GARDENS SURGERY": {
       "status": "warm_lead_pcn",
@@ -12842,7 +12842,7 @@
       "lead_score": 1
     },
     "H81002 - KNOWLE GREEN MEDICAL": {
-      "status": "churned",
+      "status": "churn_notification",
       "lead_score": 1
     },
     "H81003 - SUNBURY GROUP PRACTICE": {
@@ -13698,8 +13698,8 @@
       "lead_score": 1
     },
     "H83033 - ASHBURTON PARK MEDICAL CENTRE": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "H83034 - WHITEHORSE PRACTICE": {
       "status": "warm_lead_pcn",
@@ -13770,12 +13770,12 @@
       "lead_score": 3
     },
     "H84005 - PARKSHOT MEDICAL PRACTICE": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "H84006 - RICHMOND MEDICAL GROUP": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "H84007 - ACORN GROUP PRACTICE": {
       "status": "churned",
@@ -13798,8 +13798,8 @@
       "lead_score": 1
     },
     "H84016 - GROVES MEDICAL CENTRE": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "H84017 - SEYMOUR HOUSE SURGERY": {
       "status": "warm_lead_pcn",
@@ -13826,12 +13826,12 @@
       "lead_score": 1
     },
     "H84030 - CENTRAL SURGERY": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "H84031 - JUBILEE SURGERY": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "H84032 - HAMPTON WICK SURGERY": {
       "status": "warm_lead_pcn",
@@ -13846,12 +13846,12 @@
       "lead_score": 1
     },
     "H84039 - CROSS DEEP SURGERY": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "H84040 - HAMPTON MEDICAL CENTRE": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "H84041 - VINEYARD SURGERY": {
       "status": "hot_lead",
@@ -13890,8 +13890,8 @@
       "lead_score": 1
     },
     "H84057 - STAINES ROAD MEDICAL CENTRE": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "H84059 - THAMESIDE MEDICAL PRACTICE": {
       "status": "warm_lead_pcn",
@@ -13942,8 +13942,8 @@
       "lead_score": 3
     },
     "H85002 - FALCON ROAD MEDICAL CENTRE": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "free_trial_live",
+      "lead_score": 8
     },
     "H85003 - QUEENSTOWN ROAD MEDICAL PRACTICE": {
       "status": "warm_lead_pcn",
@@ -13974,7 +13974,7 @@
       "lead_score": 3
     },
     "H85018 - MULGRAVE ROAD SURGERY": {
-      "status": "churned",
+      "status": "churn_notification",
       "lead_score": 1
     },
     "H85020 - NELSON MEDICAL PRACTICE": {
@@ -14054,8 +14054,8 @@
       "lead_score": 1
     },
     "H85048 - BROCKLEBANK GROUP PRACTICE": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "H85049 - BATTERSEA RISE GROUP PRACTICE": {
       "status": "hot_lead",
@@ -14090,8 +14090,8 @@
       "lead_score": 1
     },
     "H85065 - ALTON PRACTICE": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "H85066 - BALHAM PARK SURGERY": {
       "status": "warm_lead_pcn",
@@ -14110,8 +14110,8 @@
       "lead_score": 1
     },
     "H85075 - HAIDER PRACTICE": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "H85076 - STONECOT SURGERY": {
       "status": "cold_lead",
@@ -14122,16 +14122,16 @@
       "lead_score": 1
     },
     "H85078 - MITCHAM FAMILY PRACTICE": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "H85082 - TRIANGLE SURGERY": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "H85087 - OPEN DOOR SURGERY": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "H85088 - CLAPHAM JUNCTION MEDICAL PRACTICE": {
       "status": "cold_lead",
@@ -14178,16 +14178,16 @@
       "lead_score": 5
     },
     "H85113 - MALDON ROAD SURGERY": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "H85114 - THURLEIGH ROAD PRACTICE": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "H85115 - SHOTFIELD MEDICAL PRACTICE": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "H85116 - MANOR PRACTICE": {
       "status": "warm_lead_pcn",
@@ -14222,8 +14222,8 @@
       "lead_score": 3
     },
     "H85662 - BEECHES SURGERY": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "H85664 - TOOTING BEC SURGERY": {
       "status": "warm_lead_pcn",
@@ -14930,8 +14930,8 @@
       "lead_score": 1
     },
     "J82152 - BRIDGEMARY MEDICAL CENTRE": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "onboarding",
+      "lead_score": 7
     },
     "J82154 - MEON HEALTH PRACTICE": {
       "status": "warm_lead",
@@ -15606,7 +15606,7 @@
       "lead_score": 3
     },
     "K81087 - EASTHAMPSTEAD SURGERY": {
-      "status": "churned",
+      "status": "churn_notification",
       "lead_score": 1
     },
     "K81089 - RAGSTONE ROAD SURGERY": {
@@ -16514,7 +16514,7 @@
       "lead_score": 1
     },
     "L81004 - PORTISHEAD MEDICAL GROUP": {
-      "status": "churned",
+      "status": "churn_notification",
       "lead_score": 1
     },
     "L81007 - BRIDGE VIEW MEDICAL": {
@@ -17066,8 +17066,8 @@
       "lead_score": 1
     },
     "L82066 - PORT VIEW SURGERY": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "onboarding",
+      "lead_score": 7
     },
     "L82068 - GODOLPHIN HEALTH": {
       "status": "warm_lead",
@@ -18082,8 +18082,8 @@
       "lead_score": 1
     },
     "M81009 - GOLDEN VALLEY PRACTICE": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "M81010 - KIDDERMINSTER MEDICAL CENTRE": {
       "status": "cold_lead",
@@ -18130,8 +18130,8 @@
       "lead_score": 1
     },
     "M81024 - MUCH BIRCH SURGERY": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "M81025 - NEW ROAD SURGERY": {
       "status": "cold_lead",
@@ -18382,8 +18382,8 @@
       "lead_score": 1
     },
     "M82006 - RIVERSIDE MED PRACTICE": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "onboarding",
+      "lead_score": 7
     },
     "M82007 - CHARLTON MEDICAL PRACTICE": {
       "status": "cold_lead",
@@ -18530,8 +18530,8 @@
       "lead_score": 1
     },
     "M82056 - LINDEN HALL SURGERY": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "onboarding",
+      "lead_score": 7
     },
     "M82057 - HOLLINSWOOD SURGERY": {
       "status": "cold_lead",
@@ -18706,8 +18706,8 @@
       "lead_score": 3
     },
     "M83045 - PENKRIDGE MEDICAL PRACTICE": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "onboarding",
+      "lead_score": 7
     },
     "M83046 - BIDDULPH VALLEY SURGERY": {
       "status": "cold_lead",
@@ -18730,8 +18730,8 @@
       "lead_score": 1
     },
     "M83051 - WETMORE ROAD SURGERY": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "onboarding",
+      "lead_score": 7
     },
     "M83052 - WEEPING CROSS HEALTH CENTRE": {
       "status": "customer",
@@ -18790,8 +18790,8 @@
       "lead_score": 1
     },
     "M83071 - PARK MEDICAL CENTRE": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "onboarding",
+      "lead_score": 7
     },
     "M83072 - SALTERS MEADOW HEALTH CTR": {
       "status": "cold_lead",
@@ -20162,8 +20162,8 @@
       "lead_score": 3
     },
     "M87012 - THE GREENS HEALTH CENTRE": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "free_trial_live",
+      "lead_score": 8
     },
     "M87013 - TANDON MEDICAL CENTRE (ORAM & PARTNERS)": {
       "status": "cold_lead",
@@ -20594,8 +20594,8 @@
       "lead_score": 1
     },
     "M91015 - UMBRELLA MEDICAL": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "free_trial_live",
+      "lead_score": 8
     },
     "M91016 - NEW INVENTION HEALTH CENTRE": {
       "status": "cold_lead",
@@ -20754,8 +20754,8 @@
       "lead_score": 3
     },
     "M92006 - COALWAY ROAD SURGERY": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "M92007 - LEA ROAD MEDICAL PRACTICE": {
       "status": "warm_lead_pcn",
@@ -20774,28 +20774,28 @@
       "lead_score": 3
     },
     "M92011 - RWT PRACTICES PENN MANOR MEDICAL CENTRE": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "M92012 - DUNCAN STREET PRIMARY CARE CENTRE": {
       "status": "customer",
       "lead_score": 0
     },
     "M92013 - DR SINHA & TAHIR": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "M92015 - IMPROVING HEALTH (IH) MEDICAL": {
       "status": "cold_lead",
       "lead_score": 1
     },
     "M92016 - TUDOR MEDICAL CENTRE": {
-      "status": "churned",
+      "status": "churn_notification",
       "lead_score": 1
     },
     "M92019 - KEATS GROVE SURGERY": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "M92022 - ASHMORE PARK MEDICAL CENTRE": {
       "status": "warm_lead_pcn",
@@ -20806,8 +20806,8 @@
       "lead_score": 3
     },
     "M92028 - THORNLEY STREET SURGERY": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "M92029 - NEWBRIDGE SURGERY": {
       "status": "customer",
@@ -20858,12 +20858,12 @@
       "lead_score": 3
     },
     "M92649 - DR MUDIGONDA": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "free_trial_live",
+      "lead_score": 8
     },
     "M92654 - BAGARY'S MEDICAL PRACTICE": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "N81001 - AUDLEM MEDICAL PRACTICE": {
       "status": "cold_lead",
@@ -21398,8 +21398,8 @@
       "lead_score": 1
     },
     "N82046 - SEFTON PARK MEDICAL CENTRE": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "onboarding",
+      "lead_score": 7
     },
     "N82048 - WALTON MEDICAL CENTRE": {
       "status": "cold_lead",
@@ -21962,8 +21962,8 @@
       "lead_score": 3
     },
     "N84027 - ORRELL PARK MEDICAL CENTRE": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "free_trial_live",
+      "lead_score": 8
     },
     "N84028 - THE STRAND MEDICAL CENTRE": {
       "status": "cold_lead",
@@ -21998,7 +21998,7 @@
       "lead_score": 1
     },
     "N84605 - LITHERLAND PRACTICE": {
-      "status": "churned",
+      "status": "churn_notification",
       "lead_score": 1
     },
     "N84613 - THE CORNER SURGERY (DR MULLA)": {
@@ -22010,8 +22010,8 @@
       "lead_score": 5
     },
     "N84615 - RAWSON ROAD MEDICAL CENTRE": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "free_trial_live",
+      "lead_score": 8
     },
     "N84617 - KEW SURGERY": {
       "status": "warm_lead_pcn",
@@ -22202,8 +22202,8 @@
       "lead_score": 1
     },
     "N85640 - LEASOWE MEDICAL PRACTICE": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "onboarding",
+      "lead_score": 7
     },
     "N85643 - PRENTON & WOODCHURCH MEDICAL CENTRE": {
       "status": "cold_lead",
@@ -22966,8 +22966,8 @@
       "lead_score": 1
     },
     "P82031 - HEATON MEDICAL CENTRE": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "P82033 - BRADFORD STREET SURGERY": {
       "status": "cold_lead",
@@ -23646,8 +23646,8 @@
       "lead_score": 1
     },
     "P86022 - STONEFIELD STREET SURGERY": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "free_trial_live",
+      "lead_score": 8
     },
     "P86023 - HOPWOOD MEDICAL CENTRE": {
       "status": "cold_lead",
@@ -24606,7 +24606,7 @@
       "lead_score": 1
     },
     "Y00969 - RAME GROUP PRACTICE": {
-      "status": "churned",
+      "status": "churn_notification",
       "lead_score": 1
     },
     "Y00996 - MERIDIAN PRACTICE": {
@@ -24674,8 +24674,8 @@
       "lead_score": 3
     },
     "Y01206 - GLEBE ROAD SURGERY": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "Y01221 - SOMERSET FHP O": {
       "status": "cold_lead",
@@ -24954,8 +24954,8 @@
       "lead_score": 1
     },
     "Y02653 - HIGH OAK SURGERY": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "free_trial_live",
+      "lead_score": 8
     },
     "Y02657 - BENTHAM ROAD HEALTH CENTRE": {
       "status": "cold_lead",
@@ -25022,8 +25022,8 @@
       "lead_score": 1
     },
     "Y02736 - SHOWELL PARK HEALTH CENTRE": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "pilot_live",
+      "lead_score": 9
     },
     "Y02747 - HAXBY GROUP HULL": {
       "status": "cold_lead",
@@ -25086,7 +25086,7 @@
       "lead_score": 1
     },
     "Y02847 - PARLIAMENT STREET MEDICAL CENTRE": {
-      "status": "churned",
+      "status": "churn_notification",
       "lead_score": 1
     },
     "Y02849 - CITY HEALTH CENTRE": {
@@ -25366,8 +25366,8 @@
       "lead_score": 3
     },
     "Y05330 - WELBOURNE MED PRAC, WELBOURNE H C": {
-      "status": "hot_lead",
-      "lead_score": 5
+      "status": "free_trial_live",
+      "lead_score": 8
     },
     "Y05346 - WESTWOOD PRIMARY CARE CENTRE": {
       "status": "warm_lead",

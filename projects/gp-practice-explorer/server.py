@@ -250,12 +250,20 @@ def search_practices(
     icb_lower = icb_name.lower().strip()
     pcn_lower = pcn_name.lower().strip()
 
+    LIVE_STATUSES = {"customer", "pilot_live", "free_trial_live"}
+    CONTACTED_STATUSES = {"customer", "pilot_live", "free_trial_live", "onboarding", "warm_lead", "warm_lead_pcn", "hot_lead", "churned", "churn_notification", "lost"}
+
     results = []
     for p in PRACTICES.values():
         if status != "all":
-            if status == "hot_lead":
-                pcn = PCN_STATS.get(p["pcn_name"], {})
-                if not (p["status"] == "warm_lead_pcn" and pcn.get("penetration", 0) >= 50):
+            if status == "live":
+                if p["status"] not in LIVE_STATUSES:
+                    continue
+            elif status == "contacted":
+                if p["status"] not in CONTACTED_STATUSES:
+                    continue
+            elif status == "warm":
+                if p["status"] not in ("warm_lead", "warm_lead_pcn"):
                     continue
             elif p["status"] != status:
                 continue
@@ -470,9 +478,9 @@ def get_icb_summary(icb_name: str = "") -> dict:
             icb_stats[icb]["total_practices"] += 1
             if p["is_customer"]:
                 icb_stats[icb]["customers"] += 1
-            elif p["status"] == "warm_lead_pcn":
+            elif p["status"] in ("warm_lead_pcn", "warm_lead"):
                 icb_stats[icb]["warm_leads"] += 1
-            else:
+            elif p["status"] == "cold_lead":
                 icb_stats[icb]["cold_leads"] += 1
 
         for icb in icb_stats.values():
@@ -501,15 +509,24 @@ def get_icb_summary(icb_name: str = "") -> dict:
     for p in practices_in_icb:
         pcn = p["pcn_name"]
         if pcn not in pcn_breakdown:
-            pcn_breakdown[pcn] = {"pcn_name": pcn, "total": 0, "customers": 0, "warm_leads": 0}
+            pcn_breakdown[pcn] = {"pcn_name": pcn, "total": 0, "customers": 0, "warm_leads": 0, "contacted": 0, "no_contact": 0}
         pcn_breakdown[pcn]["total"] += 1
         if p["is_customer"]:
             pcn_breakdown[pcn]["customers"] += 1
-        elif p["status"] == "warm_lead_pcn":
+        elif p["status"] in ("warm_lead_pcn", "warm_lead"):
             pcn_breakdown[pcn]["warm_leads"] += 1
+        if p["status"] == "cold_lead":
+            pcn_breakdown[pcn]["no_contact"] += 1
+        else:
+            pcn_breakdown[pcn]["contacted"] += 1
 
     total = len(practices_in_icb)
     customers = sum(1 for p in practices_in_icb if p["is_customer"])
+
+    practices_list = sorted(
+        [_practice_summary(p) for p in practices_in_icb],
+        key=lambda x: -x["lead_score"],
+    )
 
     return {
         "icb_name": target_icb,
@@ -518,9 +535,12 @@ def get_icb_summary(icb_name: str = "") -> dict:
         "total_practices": total,
         "customers": customers,
         "penetration_pct": round(customers / total * 100, 1) if total else 0,
-        "warm_leads": sum(1 for p in practices_in_icb if p["status"] == "warm_lead_pcn"),
+        "warm_leads": sum(1 for p in practices_in_icb if p["status"] in ("warm_lead_pcn", "warm_lead")),
         "cold_leads": sum(1 for p in practices_in_icb if p["status"] == "cold_lead"),
+        "contacted": sum(1 for p in practices_in_icb if p["status"] != "cold_lead"),
+        "no_contact": sum(1 for p in practices_in_icb if p["status"] == "cold_lead"),
         "pcn_breakdown": sorted(pcn_breakdown.values(), key=lambda x: -x["customers"]),
+        "practices": practices_list,
     }
 
 
@@ -537,10 +557,16 @@ def get_statistics_overview() -> dict:
     """
     total = len(PRACTICES)
     customers = sum(1 for p in PRACTICES.values() if p["is_customer"])
-    warm_leads = sum(1 for p in PRACTICES.values() if p["status"] == "warm_lead_pcn")
+    warm_leads = sum(1 for p in PRACTICES.values() if p["status"] in ("warm_lead_pcn", "warm_lead"))
     cold_leads = sum(1 for p in PRACTICES.values() if p["status"] == "cold_lead")
     total_patients = sum(p["number_of_patients"] for p in PRACTICES.values())
     customer_patients = sum(p["number_of_patients"] for p in PRACTICES.values() if p["is_customer"])
+    pilot_live = sum(1 for p in PRACTICES.values() if p["status"] == "pilot_live")
+    free_trial_live = sum(1 for p in PRACTICES.values() if p["status"] == "free_trial_live")
+    onboarding = sum(1 for p in PRACTICES.values() if p["status"] == "onboarding")
+    churned = sum(1 for p in PRACTICES.values() if p["status"] in ("churned", "churn_notification"))
+    hot_leads = sum(1 for p in PRACTICES.values() if p["status"] == "hot_lead")
+    lost = sum(1 for p in PRACTICES.values() if p["status"] == "lost")
 
     hot_pcns = [
         {"pcn_name": k, "penetration_pct": round(v["penetration"], 1), "customers": v["customers"], "total": v["total"]}
@@ -574,6 +600,12 @@ def get_statistics_overview() -> dict:
         },
         "warm_leads": warm_leads,
         "cold_leads": cold_leads,
+        "pilot_live": pilot_live,
+        "free_trial_live": free_trial_live,
+        "onboarding": onboarding,
+        "churned": churned,
+        "hot_leads": hot_leads,
+        "lost": lost,
         "hot_pcns": hot_pcns[:10],
         "warm_pcns": warm_pcns[:10],
         "top_icbs_by_customers": [{"icb": k, "customers": v} for k, v in top_icbs],
