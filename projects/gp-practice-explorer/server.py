@@ -370,6 +370,7 @@ def get_pcn_details(pcn_name: str) -> dict:
         icb = stats.get("icb", members[0]["icb_name"] if members else "Unknown")
         icb_priority = ICB_PRIORITIES.get(icb, {})
 
+        total_patients = sum(m["number_of_patients"] for m in members)
         results.append({
             "pcn_name": pcn,
             "icb_name": icb,
@@ -378,6 +379,7 @@ def get_pcn_details(pcn_name: str) -> dict:
             "total_practices": stats.get("total", len(members)),
             "customers": stats.get("customers", 0),
             "penetration_pct": round(stats.get("penetration", 0), 1),
+            "total_patients": total_patients,
             "pcn_status": stats.get("status", "cold"),
             "practices": [_practice_summary(m) for m in members],
         })

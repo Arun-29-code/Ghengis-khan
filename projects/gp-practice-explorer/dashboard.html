@@ -360,6 +360,7 @@ async function showPCN(name) {
       <h2>${esc(pcn.pcn_name)}</h2>
       <div class="meta">
         <span>${esc(pcn.icb_name)}</span>
+        <span>${fmt(pcn.total_patients || 0)} patients</span>
         <span>${pcn.penetration_pct}% penetration</span>
         <span>${pcn.customers}/${pcn.total_practices} customers</span>
       </div>
@@ -609,6 +610,7 @@ async function showPCNInICB(pcnName, icbName) {
       <h2>${esc(pcn.pcn_name)}</h2>
       <div class="meta">
         <span>${esc(pcn.icb_name)}</span>
+        <span>${fmt(pcn.total_patients || 0)} patients</span>
         <span>${pcn.penetration_pct}% penetration</span>
         <span>${pcn.customers}/${pcn.total_practices} customers</span>
       </div>
