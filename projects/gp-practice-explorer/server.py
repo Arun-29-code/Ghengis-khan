@@ -190,14 +190,12 @@ def _practice_full(p: dict) -> dict:
 
 
 def _size_bucket(n: int) -> str:
-    if n < 10000:
-        return "<10k"
-    elif n < 20000:
-        return "10k-20k"
-    elif n < 30000:
-        return "20k-30k"
+    if n < 15000:
+        return "<15k"
+    elif n <= 30000:
+        return "15k-30k"
     else:
-        return "30k+"
+        return ">30k"
 
 
 # ---------------------------------------------------------------------------
@@ -699,6 +697,7 @@ def get_lead_context(practice_id: str) -> dict:
 def list_top_opportunities(
     icb_name: str = "",
     clinical_system: str = "all",
+    size: str = "all",
     limit: int = 20,
 ) -> dict:
     """
@@ -725,6 +724,9 @@ def list_top_opportunities(
             continue
         if clinical_system != "all" and clinical_system.lower() not in p["clinical_system"].lower():
             continue
+        if size != "all":
+            if _size_bucket(p["number_of_patients"]) != size:
+                continue
 
         pcn = p["pcn_name"]
         pcn_stat = PCN_STATS.get(pcn, {})
@@ -1084,8 +1086,9 @@ async def api_opportunities(request: Request):
         return _UNAUTHORIZED
     icb_name = request.query_params.get("icb_name", "")
     clinical_system = request.query_params.get("clinical_system", "all")
+    size = request.query_params.get("size", "all")
     limit = min(int(request.query_params.get("limit", "50")), 100)
-    return JSONResponse(list_top_opportunities(icb_name=icb_name, clinical_system=clinical_system, limit=limit))
+    return JSONResponse(list_top_opportunities(icb_name=icb_name, clinical_system=clinical_system, size=size, limit=limit))
 
 async def api_search(request: Request):
     if not _check_auth(request):
@@ -1094,8 +1097,9 @@ async def api_search(request: Request):
     status = request.query_params.get("status", "all")
     clinical_system = request.query_params.get("clinical_system", "all")
     icb_name = request.query_params.get("icb_name", "")
+    size = request.query_params.get("size", "all")
     limit = min(int(request.query_params.get("limit", "30")), 100)
-    return JSONResponse(search_practices(query=query, status=status, clinical_system=clinical_system, icb_name=icb_name, limit=limit))
+    return JSONResponse(search_practices(query=query, status=status, clinical_system=clinical_system, icb_name=icb_name, size=size, limit=limit))
 
 async def api_practice(request: Request):
     if not _check_auth(request):
